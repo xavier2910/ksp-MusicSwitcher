@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace MusicSwitcher
 {
+    /// <summary>
+    /// A wrapper around an AudioSource and a TQ.
+    /// </summary>
     internal class Layer
     {
         private AudioSource src;
@@ -35,8 +38,23 @@ namespace MusicSwitcher
         }
 
         public void Reset() {
-            src.Stop();
+            Stop();
             clipQ.Clear();
+        }
+
+        public void Stop()
+        {
+            src.Stop();
+        }
+
+        public void Pause()
+        {
+            src.Pause();
+        }
+
+        public void UnPause()
+        {
+            src.UnPause();
         }
     }
 }
