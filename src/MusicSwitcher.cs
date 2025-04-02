@@ -101,16 +101,16 @@ namespace MusicSwitcher
         /// Reverts music to the control of the stock MusicLogic for
         /// those who so desire
         /// </summary>
-        /// <param name="enableAudio2">
+        /// <param name="enableCrickets">
         /// So funny story, in some scenes the audio2 audio source doesn't get
         /// properly dealt with by the stock MusicLogic, and so you end up with
         /// a cricket infestation in the Tracking Station. The default is false; you
         /// need only bother with this if there are missing crickets.
         /// </param>
-        public void RevertToStock(bool enableAudio2 = false)
+        public void RevertToStock(bool enableCrickets = false)
         {
             extractor.tameMusicLogic.audio1.enabled = true;
-            extractor.tameMusicLogic.audio2.enabled = enableAudio2;
+            extractor.tameMusicLogic.audio2.enabled = enableCrickets;
             extractor.tameMusicLogic.enabled = true;
             var phs = GetComponents<PauseAudioFadeHandler>();
             foreach (var ph in phs)
