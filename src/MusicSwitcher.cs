@@ -12,22 +12,16 @@ namespace MusicSwitcher
     public class MusicSwitcher : MonoBehaviour {
 
         private Dictionary<int, Layer> layers;
-        // we hang on to this because it has all the default clips loaded into it
-        // and so we can treat it as our little clip-hoard.
-        private MusicLogic tameMusicLogic;
 
         private void Awake() 
         {
             HijackMusicLogic();
-            ExtractStaticClips();
+            gameObject.AddComponent<StockMusicExtractor>();
             SetGlobalInstance();
         }
 
         private void HijackMusicLogic()
         {
-            tameMusicLogic = GetComponent<MusicLogic>();
-            tameMusicLogic.enabled = false;
-
             var asrcs = GetComponents<AudioSource>();
             foreach (var asrc in asrcs)
             {
@@ -39,12 +33,6 @@ namespace MusicSwitcher
             {
                 ph.enabled = false;
             }
-        }
-
-        private void ExtractStaticClips()
-        {
-            Statics.Clips.mainMenuAmbience = tameMusicLogic.menuAmbience;
-            Statics.Clips.mainMenuTheme = tameMusicLogic.menuTheme;
         }
 
         private void SetGlobalInstance()

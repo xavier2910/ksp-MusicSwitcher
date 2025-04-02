@@ -22,5 +22,9 @@ namespace MusicSwitcher
 
             ms.Enqueue(new Track(Statics.Clips.mainMenuAmbience, true));
         }
+
+        private void OnDestroy() {
+            Statics.switcherInstance.ClearAll();
+        }
     }
 }
