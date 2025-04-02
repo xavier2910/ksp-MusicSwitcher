@@ -4,9 +4,6 @@
     <PropertyGroup>
         <TargetFramework>net481</TargetFramework>
     </PropertyGroup>
-    <PropertyGroup>
-        <GenerateKSPAssemblyAttribute>true</GenerateKSPAssemblyAttribute>
-    </PropertyGroup>
 
     <!-- Declare project -->
     <PropertyGroup>
@@ -16,6 +13,7 @@
     <ItemGroup>
         <Compile Include="*.cs"></Compile>
         <Compile Include="Behaviors/*.cs" />
+        <Compile Include="Properties/AssemblyInfo.cs" />
     </ItemGroup>
 
     <Import Project="MusicSwitcher.csproj.user" />
@@ -27,8 +25,7 @@
             <URL>
                 https://github.com/xavier2910/$(ModName)/releases/latest/download/$(ModName).version</URL>
             <Download>https://github.com/xavier2910/$(ModName)/releases/latest</Download>
-            <!-- Mutiny is the limiting factor here -->
-            <KSP_Version_Min>1.12.3</KSP_Version_Min>
+            <KSP_Version_Min>1.12.5</KSP_Version_Min>
         </KSPVersionFile>
     </ItemGroup>
 
@@ -61,6 +58,14 @@
         <!-- for AudioListener -->
         <Reference Include="$(KSPRoot)$(RelativeManagedPath)UnityEngine.AudioModule.dll">
             <Private>False</Private>
+        </Reference>
+    </ItemGroup>
+
+    <!-- Mod dependencies -->
+    <ItemGroup>
+        <Reference Include="$(KSPRoot)GameData/ModuleManager*.dll">
+            <Private>False</Private>
+            <CKANIdentifier>ModuleManager</CKANIdentifier>
         </Reference>
     </ItemGroup>
 
