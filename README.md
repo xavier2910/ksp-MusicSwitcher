@@ -3,7 +3,7 @@ Plugin to change the music in Kerbal Space Program.
 Compatible with versions 1.12.3-1.12.5.
 
 ## Dependencies
-* [Mutiny](https://github.com/KSPModdingLibs/Mutiny)
+* None! : \)
 
 ## Building
 These instructions are for building *without* Visual Studio. I don't use VS and so I don't know how to
