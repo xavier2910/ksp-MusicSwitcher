@@ -13,6 +13,7 @@ namespace MusicSwitcher
 
         private Dictionary<int, Layer> layers;
         private StockMusicExtractor extractor;
+        private bool usingStockMusic = false;
 
         #region UnityMessages
 
@@ -21,20 +22,6 @@ namespace MusicSwitcher
             extractor = gameObject.AddComponent<StockMusicExtractor>();
             TakeOver();
             SetGlobalInstance();
-        }
-
-        private void HijackMusicLogic()
-        {
-            var asrcs = GetComponents<AudioSource>();
-            foreach (var asrc in asrcs)
-            {
-                asrc.enabled = false;
-            }
-            var phs = GetComponents<PauseAudioFadeHandler>();
-            foreach (var ph in phs)
-            {
-                ph.enabled = false;
-            }
         }
 
         private void SetGlobalInstance()
@@ -48,13 +35,19 @@ namespace MusicSwitcher
         }
 
         private void Update() {
-            foreach (var layer in layers.Values)
-            {
-                if (layer.IsReadyForNextTrack())
+            if (!usingStockMusic) {
+                foreach (var layer in layers.Values)
                 {
-                    layer.PlayNextTrack();
+                    if (layer.IsReadyForNextTrack())
+                    {
+                        layer.PlayNextTrack();
+                    }
                 }
             }
+        }
+
+        private void OnDestroy() {
+            Debug.Log("[MusicSwitcher] being destroyed -- bye!");
         }
 
         #endregion
@@ -109,6 +102,8 @@ namespace MusicSwitcher
         /// </param>
         public void RevertToStock(bool enableCrickets = false)
         {
+            Debug.Log("[MusicSwitcher] Reverting to stock MusicLogic");
+            usingStockMusic = true;
             extractor.tameMusicLogic.audio1.enabled = true;
             extractor.tameMusicLogic.audio2.enabled = enableCrickets;
             extractor.tameMusicLogic.enabled = true;
@@ -121,6 +116,8 @@ namespace MusicSwitcher
 
         public void TakeOver()
         {
+            Debug.Log("[MusicSwticher] Taking command of the music!");
+            usingStockMusic = false;
             extractor.tameMusicLogic.enabled = false;
             extractor.tameMusicLogic.audio1.enabled = false;
             extractor.tameMusicLogic.audio2.enabled = false;
