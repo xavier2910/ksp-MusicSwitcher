@@ -30,5 +30,20 @@ namespace MusicSwitcher
             Statics.Clips.mainMenuAmbience = tameMusicLogic.menuAmbience;
             Statics.Clips.mainMenuTheme = tameMusicLogic.menuTheme;
         }
+
+        // also includes tracking station and other buildings
+        // nb does not include editor music
+        private void ExtractKSCAmbience()
+        {
+            Statics.Clips.kscDay = tameMusicLogic.spaceCenterAmbienceDay;
+            Statics.Clips.kscNight = tameMusicLogic.spaceCenterAmbienceNight;
+            Statics.Clips.trackingStation = tameMusicLogic.trackingAmbience;
+            Statics.Clips.rnd = tameMusicLogic.researchComplexAmbience;
+            Statics.Clips.missionctl = tameMusicLogic.missionControlAmbience;
+            Statics.Clips.admin = tameMusicLogic.adminFacilityAmbience;
+            Statics.Clips.astroComplex = tameMusicLogic.astroComplexAmbience;
+            Statics.Clips.sph = tameMusicLogic.SPHAmbience;
+            Statics.Clips.vab = tameMusicLogic.VABAmbience;
+        }
     }
 }

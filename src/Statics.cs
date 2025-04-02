@@ -19,6 +19,15 @@ namespace MusicSwitcher
         {
             public static AudioClip mainMenuTheme;
             public static AudioClip mainMenuAmbience;
+            public static AudioClip kscDay;
+            public static AudioClip kscNight;
+            public static AudioClip trackingStation;
+            public static AudioClip rnd;
+            public static AudioClip missionctl;
+            public static AudioClip admin;
+            public static AudioClip astroComplex;
+            public static AudioClip sph;
+            public static AudioClip vab;
         }
     }
 }
