@@ -15,19 +15,21 @@ namespace MusicSwitcher
         internal static readonly string kMusicSwitcherTag = "MusicSwitcher";
         internal static readonly int kNLayersDefault = 3;
 
-        internal static class Clips
+        public static class Clips
         {
-            public static AudioClip mainMenuTheme;
-            public static AudioClip mainMenuAmbience;
-            public static AudioClip kscDay;
-            public static AudioClip kscNight;
-            public static AudioClip trackingStation;
-            public static AudioClip rnd;
-            public static AudioClip missionctl;
-            public static AudioClip admin;
-            public static AudioClip astroComplex;
-            public static AudioClip sph;
-            public static AudioClip vab;
+            public static AudioClip mainMenuTheme {get; internal set;}
+            public static AudioClip mainMenuAmbience {get; internal set;}
+            public static AudioClip kscDay {get; internal set;}
+            public static AudioClip kscNight {get; internal set;}
+            public static AudioClip trackingStation {get; internal set;}
+            public static AudioClip rnd {get; internal set;}
+            public static AudioClip missionctl {get; internal set;}
+            public static AudioClip admin {get; internal set;}
+            public static AudioClip astroComplex {get; internal set;}
+            public static AudioClip sph {get; internal set;}
+            public static AudioClip vab {get; internal set;}
+
+            public static AudioClip stratejazz {get => admin;}
         }
     }
 }
