@@ -15,6 +15,7 @@
     </PropertyGroup>
     <ItemGroup>
         <Compile Include="*.cs"></Compile>
+        <Compile Include="Behaviors/*.cs" />
     </ItemGroup>
 
     <Import Project="MusicSwitcher.csproj.user" />
