@@ -5,13 +5,13 @@ using UnityEngine;
 namespace MusicSwitcher
 {
     [KSPAddon(KSPAddon.Startup.MainMenu, false)]
-    internal class MainMenu : MonoBehaviour
+    internal class MainMenuDefaultBehavior : MonoBehaviour
     {
         private static bool isFirstTime = true;
 
         private void Start() {
 
-            var ms = Statics.GetSwitcher();
+            var ms = Statics.switcherInstance;
             ms.ClearAll();
 
             if (isFirstTime)

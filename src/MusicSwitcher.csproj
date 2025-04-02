@@ -74,7 +74,7 @@
         />
     </Target>
     <Target Name="Clean">
-        <Delete Files="@(OutputPath)@(ModName).dll" />
+        <Delete Files="$(OutputPath)$(ModName).dll" />
     </Target>
     <Target Name="Rebuild" DependsOnTargets="Clean;Build" />
 

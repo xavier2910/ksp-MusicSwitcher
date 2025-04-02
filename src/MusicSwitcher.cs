@@ -20,6 +20,7 @@ namespace MusicSwitcher
         {
             HijackMusicLogic();
             ExtractStaticClips();
+            SetGlobalInstance();
         }
 
         private void HijackMusicLogic()
@@ -44,6 +45,11 @@ namespace MusicSwitcher
         {
             Statics.Clips.mainMenuAmbience = tameMusicLogic.menuAmbience;
             Statics.Clips.mainMenuTheme = tameMusicLogic.menuTheme;
+        }
+
+        private void SetGlobalInstance()
+        {
+            Statics.switcherInstance = this;
         }
 
         private void Start() {

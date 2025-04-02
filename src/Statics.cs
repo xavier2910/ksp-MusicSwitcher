@@ -7,13 +7,10 @@ namespace MusicSwitcher
     public sealed class Statics
     {
         /// <summary>
-        /// This is the preferred way to access the global MusicSwitcher. This should
-        /// not be called repeatedly; cache it.
+        /// This is the preferred way to access the global MusicSwitcher. It will be set by the MusicSwitcher
+        /// on Awake().
         /// </summary>
-        public static MusicSwitcher GetSwitcher()
-        {
-            return GameObject.FindWithTag(kMusicSwitcherTag).GetComponent<MusicSwitcher>();
-        }
+        public static MusicSwitcher switcherInstance {get; internal set;}
 
         internal static readonly string kMusicSwitcherTag = "MusicSwitcher";
         internal static readonly int kNLayersDefault = 3;

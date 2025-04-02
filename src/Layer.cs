@@ -7,29 +7,22 @@ namespace MusicSwitcher
     internal class Layer
     {
         private AudioSource src;
-        private Queue<Track> clipQ;
+        private TrackQueue clipQ;
 
         public Layer(AudioSource src)
         {
             this.src = src;
-            clipQ = new Queue<Track>();
+            clipQ = new TrackQueue();
         }
 
         public bool IsReadyForNextTrack()
         {
-            bool clipAvailable = false;
-            try
-            {
-                clipQ.Peek();
-                clipAvailable = true;
-            }
-            catch (InvalidOperationException)
-            {
-                // nothing need happen -- we're just making a bool
-            }
-            return !src.isPlaying && clipAvailable;
+            return !src.isPlaying && !clipQ.IsEmpty();
         }
 
+        /// <summary>
+        /// Watch out, does NO nullchecks
+        /// </summary>
         public void PlayNextTrack() {
             var next = clipQ.Dequeue();
             src.loop = next.loop;
