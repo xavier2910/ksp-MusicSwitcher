@@ -21,6 +21,12 @@ namespace MusicSwitcher
             {
                 asrc.enabled = false;
             }
+            GetComponent<DetonatorDriver>().enabled = false;
+            var phs = GetComponents<PauseAudioFadeHandler>();
+            foreach (var ph in phs)
+            {
+                ph.enabled = false;
+            }
         }
 
         private void Start() {
