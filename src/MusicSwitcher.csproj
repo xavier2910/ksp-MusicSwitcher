@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0"
+    xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <TargetFramework>net481</TargetFramework>
+    </PropertyGroup>
+    <PropertyGroup>
+        <GenerateKSPAssemblyAttribute>true</GenerateKSPAssemblyAttribute>
+    </PropertyGroup>
+
+    <!-- Declare project -->
+    <PropertyGroup>
+        <ModName>MusicSwitcher</ModName>
+        <OutputPath>../GameData/$(ModName)/</OutputPath>
+    </PropertyGroup>
+    <ItemGroup>
+        <Compile Include="*.cs"></Compile>
+    </ItemGroup>
+
+    <Import Project="MusicSwitcher.csproj.user" />
+
+    <!-- Version file config -->
+    <ItemGroup>
+        <KSPVersionFile Include=".">
+            <Destination>$(RepoRootPath)GameData/$(ModName)/$(ModName).version</Destination>
+            <URL>
+                https://github.com/xavier2910/$(ModName)/releases/latest/download/$(ModName).version</URL>
+            <Download>https://github.com/xavier2910/$(ModName)/releases/latest</Download>
+            <!-- Mutiny is the limiting factor here -->
+            <KSP_Version_Min>1.12.3</KSP_Version_Min>
+        </KSPVersionFile>
+    </ItemGroup>
+
+    <!-- KSP assemblies -->
+    <PropertyGroup>
+        <RelativeManagedPath Condition="$([MSBuild]::IsOsPlatform('Windows'))">KSP_x64_Data\Managed</RelativeManagedPath>
+        <RelativeManagedPath Condition="$([MSBuild]::IsOsPlatform('Linux'))">KSP_Data/Managed/</RelativeManagedPath>
+        <RelativeManagedPath Condition="$([MSBuild]::IsOsPlatform('OSX'))">
+            KSP.app/Contents/Resources/Data/Managed</RelativeManagedPath>
+    </PropertyGroup>
+    <ItemGroup>
+        <Reference Include="$(KSPRoot)$(RelativeManagedPath)Assembly-CSharp.dll">
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="$(KSPRoot)$(RelativeManagedPath)Assembly-CSharp-firstpass.dll">
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="$(KSPRoot)$(RelativeManagedPath)UnityEngine.dll">
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="$(KSPRoot)$(RelativeManagedPath)UnityEngine.CoreModule.dll">
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="$(KSPRoot)$(RelativeManagedPath)UnityEngine.UI.dll">
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="$(KSPRoot)$(RelativeManagedPath)UnityEngine.InputLegacyModule.dll">
+            <Private>False</Private>
+        </Reference>
+        <!-- for AudioListener -->
+        <Reference Include="$(KSPRoot)$(RelativeManagedPath)UnityEngine.AudioModule.dll">
+            <Private>False</Private>
+        </Reference>
+    </ItemGroup>
+
+    <!-- Build targets -->
+    <Target Name="Build" Inputs="@(Compile)" Outputs="$(OutputPath)$(ModName).dll">
+        <!-- No need to bother mkdiring bc we already have stuff in there -->
+        <Csc
+            Sources="@(Compile)"
+            OutputAssembly="$(OutputPath)$(ModName).dll"
+            TargetType="library"
+            References="@(Reference)"
+        />
+    </Target>
+    <Target Name="Clean">
+        <Delete Files="@(OutputPath)@(ModName).dll" />
+    </Target>
+    <Target Name="Rebuild" DependsOnTargets="Clean;Build" />
+
+    <ItemGroup>
+        <PackageReference Include="KSPBuildTools" Version="0.0.3-alpha.4"></PackageReference>
+    </ItemGroup>
+
+</Project>

@@ -52,3 +52,10 @@ CodeCoverage/
 *.VisualState.xml
 TestResult.xml
 nunit-*.xml
+
+# build products
+*.dll
+*.version
+
+# user settings files
+*.user
