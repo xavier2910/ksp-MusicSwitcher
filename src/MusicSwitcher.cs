@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Log = KSPBuildTools.Log;
 
 namespace MusicSwitcher {
     /// <summary>
@@ -45,7 +46,7 @@ namespace MusicSwitcher {
         }
 
         private void OnDestroy() {
-            Debug.Log("[MusicSwitcher] being destroyed -- bye!");
+            Log.Debug("being destroyed -- bye!");
         }
 
         // I think this counts as a message.
@@ -138,7 +139,7 @@ namespace MusicSwitcher {
         /// </param>
         public void RevertToStock(bool enableCrickets = false)
         {
-            Debug.Log("[MusicSwitcher] Reverting to stock MusicLogic");
+            Log.Message("Reverting to stock MusicLogic");
             usingStockMusic = true;
             extractor.tameMusicLogic.audio1.enabled = true;
             extractor.tameMusicLogic.audio2.enabled = enableCrickets;
@@ -152,7 +153,7 @@ namespace MusicSwitcher {
 
         public void TakeOver()
         {
-            Debug.Log("[MusicSwitcher] Taking command of the music!");
+            Log.Message("Taking command of the music!");
             usingStockMusic = false;
             extractor.tameMusicLogic.enabled = false;
             extractor.tameMusicLogic.audio1.enabled = false;

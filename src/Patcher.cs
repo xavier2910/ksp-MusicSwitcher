@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Log = KSPBuildTools.Log;
 
 namespace MusicSwitcher
 {
@@ -13,10 +14,10 @@ namespace MusicSwitcher
 
             if (musicLogic == null)
             {
-                Debug.LogError("[MusicSwitcher.Patcher] Could not find MusicLogic GameObject!");
+                Log.Error("Could not find MusicLogic GameObject!", "[Patcher]");
             } else
             {
-                Debug.Log("[MusicSwitcher.Patcher] Patching MusicLogic...");
+                Log.Message("Patching MusicLogic...", "[Patcher]");
             }
 
             musicLogic.AddComponent<MusicSwitcher>();

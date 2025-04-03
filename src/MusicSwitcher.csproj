@@ -7,7 +7,6 @@
         <ModName>MusicSwitcher</ModName>
         <RepoRootPath>$(MSBuildThisFileDirectory)/../</RepoRootPath>
         <BinariesOutputRelativePath>GameData/$(ModName)/</BinariesOutputRelativePath>
-        <!--<OutputPath>../GameData/$(ModName)/</OutputPath>-->
     </PropertyGroup>
 
     <!-- Version file config -->
@@ -36,7 +35,7 @@
     </Target>
 
     <ItemGroup>
-        <PackageReference Include="KSPBuildTools" Version="0.0.3"></PackageReference>
+        <PackageReference Include="KSPBuildTools" Version="0.0.3-alpha.4"></PackageReference>
     </ItemGroup>
 
 </Project>
