@@ -89,6 +89,10 @@ namespace MusicSwitcher {
             GetLayer(layer).Reset();
         }
 
+        public void SetVolume(float vol, int layer = 0) {
+            GetLayer(layer).SetVolume(vol);
+        }
+
         /// <summary>
         /// Pretty self-explanitory I think.
         /// </summary>
@@ -105,6 +109,20 @@ namespace MusicSwitcher {
             foreach (var layer in layers.Values)
             {
                 layer.Stop();
+            }
+        }
+
+        public void PauseAll() {
+            foreach (var layer in layers.Values)
+            {
+                layer.Pause();
+            }
+        }
+
+        public void UnPauseAll() {
+            foreach (var layer in layers.Values)
+            {
+                layer.UnPause();
             }
         }
 

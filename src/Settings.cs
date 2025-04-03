@@ -6,6 +6,6 @@ namespace MusicSwitcher
 {
     internal class Settings
     {
-        [Persistent] public float volumeMaster = 1;
+        [Persistent] public float volumeMaster = 0.5f;
     }
 }

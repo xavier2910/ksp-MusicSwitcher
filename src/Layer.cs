@@ -15,6 +15,7 @@ namespace MusicSwitcher
         public Layer(AudioSource src)
         {
             this.src = src;
+            src.volume = Statics.globalSettings.volumeMaster;
             clipQ = new TrackQueue();
         }
 
@@ -55,6 +56,11 @@ namespace MusicSwitcher
         public void UnPause()
         {
             src.UnPause();
+        }
+
+        /// <param name="vol">must be on [0,1]</param>
+        public void SetVolume(float vol) {
+            src.volume = vol * Statics.globalSettings.volumeMaster;
         }
     }
 }
