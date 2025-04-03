@@ -55,6 +55,7 @@ nunit-*.xml
 
 # build products
 *.dll
+*.pdb
 *.version
 
 # user settings files
