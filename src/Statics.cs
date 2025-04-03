@@ -16,7 +16,7 @@ namespace MusicSwitcher
         /// </summary>
         public static MusicSwitcher switcherInstance {get; internal set;}
 
-        public static readonly string kSettingsCFGType = "MUSICSWITCHER_SETTINGS";
+        public static readonly string kSettingsCFGType = "MUSICSWITCHER_GLOBAL";
 
         public static class Clips
         {
@@ -36,5 +36,6 @@ namespace MusicSwitcher
         }
 
         internal static Settings globalSettings = new Settings();
+        internal static readonly string kGlobalSettingsFile = "global.cfg";
     }
 }

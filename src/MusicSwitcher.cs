@@ -49,26 +49,6 @@ namespace MusicSwitcher {
             Log.Debug("being destroyed -- bye!");
         }
 
-        // I think this counts as a message.
-        // I think it's necessary here because the `Patcher` loads `Instantly`.
-        public void ModuleManagerPostLoad() {
-
-            foreach (var urlcfg in GameDatabase.Instance.root.AllConfigs)
-            {
-                if (urlcfg.type != Statics.kSettingsCFGType)
-                {
-                    continue;
-                }
-                // this is a memo to self about cfg parsing. please do not inline
-                ConfigNode node = urlcfg.config;
-                var settings = ConfigNode.CreateObjectFromConfig<Settings>(node);
-                if (settings != null) {
-                    Statics.globalSettings = settings;
-                }
-                break; // yeah we're only gonna parse the first one
-            }
-        }
-
         #endregion
         #region PublicMethods
 
