@@ -25,7 +25,6 @@ To build:
 <Project>
     <PropertyGroup>
         <KSPRoot>/path/to/KSP/</KSPRoot>
-        <RepoRootPath>/path/to/where/you/cloned/ksp-MusicSwitcher/</RepoRootPath>
     </PropertyGroup>
 </Project>
 ```

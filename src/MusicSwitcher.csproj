@@ -5,6 +5,8 @@
     </PropertyGroup>
     <PropertyGroup>
         <ModName>MusicSwitcher</ModName>
+        <RepoRootPath>$(MSBuildThisFileDirectory)/../</RepoRootPath>
+        <BinariesOutputRelativePath>GameData/$(ModName)/</BinariesOutputRelativePath>
         <!--<OutputPath>../GameData/$(ModName)/</OutputPath>-->
     </PropertyGroup>
 
@@ -25,13 +27,6 @@
             <CKANIdentifier>ModuleManager</CKANIdentifier>
         </Reference>
     </ItemGroup>
-
-    <!-- Fix for bins getting copied into GameData/, not GameData/$(ModName)-->
-    <Target Name="FixCopyBinariesToRepo" 
-            AfterTargets="CopyBinariesToRepo">
-        <Move SourceFiles="$(RepoRootPath)GameData/$(ModName).dll;$(RepoRootPath)GameData/$(ModName).pdb"
-              DestinationFolder="$(RepoRootPath)GameData/$(ModName)/" />
-    </Target>
 
     <!-- Add cleanup -->
     <Target Name="CleanRepo" AfterTargets="CoreClean">
