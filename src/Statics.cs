@@ -4,6 +4,10 @@ using UnityEngine;
 
 namespace MusicSwitcher
 {
+    /// <summary>
+    /// Generally speaking, a class full of globals. In theory, these should be constant through the lifetime of
+    /// the plugin.
+    /// </summary>
     public sealed class Statics
     {
         /// <summary>
@@ -12,8 +16,7 @@ namespace MusicSwitcher
         /// </summary>
         public static MusicSwitcher switcherInstance {get; internal set;}
 
-        internal static readonly string kMusicSwitcherTag = "MusicSwitcher";
-        internal static readonly int kNLayersDefault = 3;
+        public static readonly string kSettingsCFGType = "MUSICSWITCHER_SETTINGS";
 
         public static class Clips
         {
@@ -31,5 +34,7 @@ namespace MusicSwitcher
 
             public static AudioClip stratejazz {get => admin;}
         }
+
+        internal static Settings globalSettings = new Settings();
     }
 }

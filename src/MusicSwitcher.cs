@@ -2,8 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace MusicSwitcher
-{
+namespace MusicSwitcher {
     /// <summary>
     /// The idea here is that other, scene-dependent components will use this
     /// to queue up music tracks. It can be accessed via the Statics.switcherInstance
@@ -30,8 +29,7 @@ namespace MusicSwitcher
         }
 
         private void Start() {
-            gameObject.tag = Statics.kMusicSwitcherTag;
-            layers = new Dictionary<int, Layer>(Statics.kNLayersDefault);
+            layers = new Dictionary<int, Layer>();
         }
 
         private void Update() {
@@ -48,6 +46,26 @@ namespace MusicSwitcher
 
         private void OnDestroy() {
             Debug.Log("[MusicSwitcher] being destroyed -- bye!");
+        }
+
+        // I think this counts as a message.
+        // I think it's necessary here because the `Patcher` loads `Instantly`.
+        public void ModuleManagerPostLoad() {
+
+            foreach (var urlcfg in GameDatabase.Instance.root.AllConfigs)
+            {
+                if (urlcfg.type != Statics.kSettingsCFGType)
+                {
+                    continue;
+                }
+                // this is a memo to self about cfg parsing. please do not inline
+                ConfigNode node = urlcfg.config;
+                var settings = ConfigNode.CreateObjectFromConfig<Settings>(node);
+                if (settings != null) {
+                    Statics.globalSettings = settings;
+                }
+                break; // yeah we're only gonna parse the first one
+            }
         }
 
         #endregion
@@ -116,7 +134,7 @@ namespace MusicSwitcher
 
         public void TakeOver()
         {
-            Debug.Log("[MusicSwticher] Taking command of the music!");
+            Debug.Log("[MusicSwitcher] Taking command of the music!");
             usingStockMusic = false;
             extractor.tameMusicLogic.enabled = false;
             extractor.tameMusicLogic.audio1.enabled = false;

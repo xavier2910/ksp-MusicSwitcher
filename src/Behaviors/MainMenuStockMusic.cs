@@ -13,6 +13,7 @@ namespace MusicSwitcher
 
             var ms = Statics.switcherInstance;
             ms.ClearAll();
+            ms.TakeOver();
 
             if (isFirstTime)
             {
