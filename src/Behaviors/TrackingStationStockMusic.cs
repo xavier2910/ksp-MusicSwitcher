@@ -8,7 +8,7 @@ namespace MusicSwitcher
     internal class TrackingStationStockMusic : MonoBehaviour
     {
         private void Awake() {
-
+            Statics.switcherInstance.ClearAll();
             Statics.switcherInstance.RevertToStock();
         }
 

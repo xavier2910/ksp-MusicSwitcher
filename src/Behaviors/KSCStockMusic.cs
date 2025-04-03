@@ -9,6 +9,7 @@ namespace MusicSwitcher
     {
         private void Awake() {
 
+            Statics.switcherInstance.ClearAll();
             Statics.switcherInstance.RevertToStock(true);
         }
 
