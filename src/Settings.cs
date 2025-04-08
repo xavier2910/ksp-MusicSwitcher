@@ -8,7 +8,7 @@ namespace MusicSwitcher
     {
         [Persistent] public float volumeMaster = 0.5f;
 
-        public string ToString() {
+        public override string ToString() {
             return "MusicSwitcher.Settings{" + ConfigNode.CreateConfigFromObject(this).ToString().Replace('\n', '\t') + "}";
         }
     }

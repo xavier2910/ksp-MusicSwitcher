@@ -17,6 +17,7 @@ namespace MusicSwitcher
         public static MusicSwitcher switcherInstance {get; internal set;}
 
         public static readonly string kSettingsCFGType = "MUSICSWITCHER_GLOBAL";
+        public static readonly string kFlightCFGType = "MUSICSWITCHER_FLIGHT";
 
         public static class Clips
         {
