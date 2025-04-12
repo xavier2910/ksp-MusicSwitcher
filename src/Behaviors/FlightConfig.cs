@@ -9,8 +9,6 @@ namespace MusicSwitcher
         /// the file extension!
         /// </summary>
         [Persistent] public string trackPath = invalidPattern;
-        [Persistent] public bool looping = false;
-        [Persistent] public string trigger = invalidPattern;
         [Persistent] public string debugName = invalidPattern;
 
         public static readonly string invalidPattern = "invalid";

@@ -11,9 +11,11 @@ namespace MusicSwitcher {
     /// </summary>
     public class MusicSwitcher : MonoBehaviour {
 
-        private Dictionary<int, Layer> layers;
+        private List<MusicController> activeControllers;
         private StockMusicExtractor extractor;
         private bool usingStockMusic = false;
+
+        public AudioSourceWrangler SourceWrangler {get; private set;}
 
         #region UnityMessages
 
@@ -30,17 +32,14 @@ namespace MusicSwitcher {
         }
 
         private void Start() {
-            layers = new Dictionary<int, Layer>();
+            activeControllers = new List<MusicController>();
         }
 
         private void Update() {
             if (!usingStockMusic) {
-                foreach (var layer in layers.Values)
+                foreach (var ctlr in activeControllers)
                 {
-                    if (layer.IsReadyForNextTrack())
-                    {
-                        layer.PlayNextTrack();
-                    }
+                    ctlr.Update();
                 }
             }
         }
@@ -53,58 +52,16 @@ namespace MusicSwitcher {
         #region PublicMethods
 
         /// <summary>
-        /// This is how you tell the thing to play music, by adding the given track
-        /// to the queue on layer `layer`. To skip to a particular track, call
-        /// `Clear()` and then this.
-        /// </summary>
-        public void Enqueue(Track t, int layer = 0)
-        {
-            GetLayer(layer).Enqueue(t);
-        }
-
-        /// <summary>
-        /// Clears the given layer's queue and stops all music on that layer.
-        /// </summary>
-        public void Clear(int layer = 0)
-        {
-            GetLayer(layer).Reset();
-        }
-
-        public void SetVolume(float vol, int layer = 0) {
-            GetLayer(layer).SetVolume(vol);
-        }
-
-        /// <summary>
         /// Pretty self-explanitory I think.
         /// </summary>
         public void ClearAll()
         {
-            foreach (var layer in layers.Values)
+            foreach (var ctlr in activeControllers)
             {
-                layer.Reset();
+                ctlr.Close();
             }
-        }
-
-        public void StopAll()
-        {
-            foreach (var layer in layers.Values)
-            {
-                layer.Stop();
-            }
-        }
-
-        public void PauseAll() {
-            foreach (var layer in layers.Values)
-            {
-                layer.Pause();
-            }
-        }
-
-        public void UnPauseAll() {
-            foreach (var layer in layers.Values)
-            {
-                layer.UnPause();
-            }
+            activeControllers.Clear();
+            SourceWrangler.ReleaseAll();
         }
 
         /// <summary>
@@ -124,6 +81,8 @@ namespace MusicSwitcher {
             extractor.tameMusicLogic.audio1.enabled = true;
             extractor.tameMusicLogic.audio2.enabled = enableCrickets;
             extractor.tameMusicLogic.enabled = true;
+            // I really have no idea what these do, but they probably do
+            // something, else they'd not be there, right?
             var phs = GetComponents<PauseAudioFadeHandler>();
             foreach (var ph in phs)
             {
@@ -138,6 +97,7 @@ namespace MusicSwitcher {
             extractor.tameMusicLogic.enabled = false;
             extractor.tameMusicLogic.audio1.enabled = false;
             extractor.tameMusicLogic.audio2.enabled = false;
+            // I really have no idea what these do, but why risk it?
             var phs = GetComponents<PauseAudioFadeHandler>();
             foreach (var ph in phs)
             {
@@ -148,27 +108,6 @@ namespace MusicSwitcher {
         #endregion
         #region PrivateHelpers
 
-        private Layer GetLayer(int layer)
-        {
-            try
-            {
-                _ = layers[layer];
-            }
-            catch (KeyNotFoundException)
-            {
-                NewLayer(layer);
-            }
-
-            return layers[layer];
-        }
-
-        /// <summary>As it stands, it does NOT check if the layer already exists</summary>
-        private void NewLayer(int layer)
-        {
-            var newSrc = gameObject.AddComponent<AudioSource>();
-            newSrc.spatialBlend = 0.0F;
-            layers[layer] = new Layer(newSrc);
-        }
 
         #endregion
     }

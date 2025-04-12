@@ -7,12 +7,8 @@ namespace MusicSwitcher {
 
     [KSPAddon(KSPAddon.Startup.Flight, false)]
     internal class FlightMusic : MonoBehaviour {
-        
-        private Dictionary<string /*condition*/, List<Track> /*to q*/> conditionalTracks
-            = new Dictionary<string, List<Track> >();
 
         private readonly string logTag = "[FlightMusic]";
-        private readonly int mainLayer = 0;
 
         #region UnityMessages
 
@@ -23,29 +19,12 @@ namespace MusicSwitcher {
 
         private void Start() {
             LoadConfigs();
-            BindEvents();
         }
 
         private void OnDestroy() {
             Statics.switcherInstance.ClearAll();
-            ReleaseEvents();
         }
 
-        #endregion
-        #region GameEventHandlers
-
-        private void BindEvents() {
-            GameEvents.VesselSituation.onReachSpace.Add(OnEnterSpace);
-        }
-
-        private void ReleaseEvents() {
-            GameEvents.VesselSituation.onReachSpace.Remove(OnEnterSpace);
-        }
-
-        private void OnEnterSpace(Vessel _) {
-            QueueTrigger(nameof(OnEnterSpace));
-        }
-        
         #endregion
         #region PrivateHelpers
 
@@ -64,10 +43,6 @@ namespace MusicSwitcher {
                 ConfigNode node = url.config;
                 var cfg = ConfigNode.CreateObjectFromConfig<FlightConfig>(node);
 
-                if (cfg.trigger == FlightConfig.invalidPattern) {
-                    Log.Warning($"'{cfg.debugName}' has an empty or invalid 'trigger' field", logTag);
-                    continue;
-                }
                 
                 Log.Debug($"Loading clip for '{cfg.debugName}' @ {cfg.trackPath}", logTag);
                 AudioClip clip = LoadClip(cfg.trackPath);
@@ -77,11 +52,9 @@ namespace MusicSwitcher {
                 }
                 loadedcfgs++;
 
-                EnsureTriggerExists(cfg.trigger);
+                //EnsureTriggerExists(cfg.trigger);
 
-                conditionalTracks[cfg.trigger].Add(
-                    new Track(clip, cfg.looping)
-                );
+                
             }
 
             Log.Debug($"loaded {loadedcfgs}/{foundcfgs} flight configs", logTag);
@@ -95,29 +68,6 @@ namespace MusicSwitcher {
             }
         }
 
-        private void EnsureTriggerExists(string cond) {
-            try {
-                _ = conditionalTracks[cond];
-            } catch (KeyNotFoundException _) {
-                conditionalTracks[cond] = new List<Track>();
-            }
-        }
-
-        private void QueueTrigger(string trigger) {
-            List<Track> toQ;
-
-            try {
-                toQ = conditionalTracks[trigger];
-            } catch (KeyNotFoundException _) {
-                Log.Debug($"trigger {trigger} has no subscribers", logTag);
-                return;
-            }
-            Statics.switcherInstance.Clear(mainLayer);
-
-            foreach (var track in toQ) {
-                Statics.switcherInstance.Enqueue(track, mainLayer);
-            }
-        }
 
         #endregion
 
