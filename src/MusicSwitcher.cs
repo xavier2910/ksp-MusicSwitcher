@@ -33,6 +33,7 @@ namespace MusicSwitcher {
 
         private void Start() {
             activeControllers = new List<MusicController>();
+            SourceWrangler = new AudioSourceWrangler(gameObject);
         }
 
         private void Update() {
@@ -50,6 +51,10 @@ namespace MusicSwitcher {
 
         #endregion
         #region PublicMethods
+
+        public void Register(MusicController ctlr) {
+            activeControllers.Add(ctlr);
+        }
 
         /// <summary>
         /// Pretty self-explanitory I think.

@@ -41,23 +41,56 @@ namespace MusicSwitcher {
                 foundcfgs++;
 
                 ConfigNode node = url.config;
-                var cfg = ConfigNode.CreateObjectFromConfig<FlightConfig>(node);
+                var cfg = ConfigNode.CreateObjectFromConfig<MusicControllerConfig>(node);
 
-                
-                Log.Debug($"Loading clip for '{cfg.debugName}' @ {cfg.trackPath}", logTag);
-                AudioClip clip = LoadClip(cfg.trackPath);
-                if (clip == null) {
-                    Log.Warning($"Could not load clip for '{cfg.debugName}' @ path {cfg.trackPath}!", logTag);
+                MusicController created = NewMusicController(cfg);
+                if (created == null) {
+                    Log.Warning($"failed to load config for {cfg.debugName}!", logTag);
                     continue;
                 }
-                loadedcfgs++;
+                Statics.switcherInstance.Register(created);
 
-                //EnsureTriggerExists(cfg.trigger);
-
-                
+                loadedcfgs++;                
             }
 
-            Log.Debug($"loaded {loadedcfgs}/{foundcfgs} flight configs", logTag);
+            Log.Message($"loaded {loadedcfgs}/{foundcfgs} flight configs", logTag);
+        }
+
+        private MusicController NewMusicController(MusicControllerConfig cfg) {
+
+            MusicController mc = null;
+            
+            try {
+                mc = (Type.GetType(cfg.typeName)
+                         .GetConstructor(new Type[]{typeof(AudioSourceWrangler)})
+                         .Invoke(new System.Object[]{Statics.switcherInstance.SourceWrangler})
+                     ) as MusicController;
+            } catch (Exception e) {
+                Log.Error($"for {cfg.debugName}: type {cfg.typeName} is inaccessible!", logTag);
+                Log.Debug($"error: {e}", logTag);
+                return null;
+            }
+            if (mc == null) {
+                Log.Error($"for {cfg.debugName}: type {cfg.typeName} is not a valid MusicController!", logTag);
+                Log.Message($"please ensure that {cfg.typeName} implements the MusicController interface", logTag);
+                return mc;
+            }
+
+            int loaded = 0;
+            foreach (string path in cfg.trackPaths) {
+                Log.Debug($"Loading clip for '{cfg.debugName}' @ {path}", logTag);
+                AudioClip clip = LoadClip(path);
+                if (clip == null) {
+                    Log.Warning($"Could not load clip for '{cfg.debugName}' @ path {path}!", logTag);
+                    continue;
+                }
+                mc.Add(clip);
+                loaded++;
+            }
+
+            Log.Message($"for {cfg.debugName}: loaded {loaded}/{cfg.trackPaths.Count} clips", logTag);
+            return mc;
+
         }
 
         private AudioClip LoadClip(string gdb) {
@@ -67,7 +100,6 @@ namespace MusicSwitcher {
                 return null;
             }
         }
-
 
         #endregion
 

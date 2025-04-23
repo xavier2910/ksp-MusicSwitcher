@@ -10,7 +10,7 @@ namespace MusicSwitcher
     /// You might have one lament your abysmal failures. On could add drama to the achievement of an escape
     /// trajectory. The edge of double-precision's the limit.
     /// </summary>
-    internal interface MusicController
+    public interface MusicController
     {
         /// <summary>
         /// Regular tasks. I mean, use `GameEvent`s whenever possible, but when not, do what you must.
