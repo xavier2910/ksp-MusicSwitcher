@@ -54,6 +54,7 @@ namespace MusicSwitcher {
                 src.Play();
                 currentTrack++;
             } else {
+                currentTrack = 0;
                 ShuffleTracks();
                 Update();
             }
