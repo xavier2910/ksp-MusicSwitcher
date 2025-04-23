@@ -2,18 +2,20 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace MusicSwitcher
+namespace MusicSwitcher.Behaviors
 {
     [KSPAddon(KSPAddon.Startup.SpaceCentre, false)]
     internal class KSCStockMusic : MonoBehaviour
     {
-        private void Awake() {
+        private void Awake()
+        {
 
             Statics.switcherInstance.ClearAll();
             Statics.switcherInstance.RevertToStock(true);
         }
 
-        private void OnDestroy() {
+        private void OnDestroy()
+        {
             Statics.switcherInstance.ClearAll();
             Statics.switcherInstance.TakeOver();
         }

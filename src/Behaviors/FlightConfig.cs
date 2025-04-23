@@ -1,6 +1,6 @@
 using System;
 
-namespace MusicSwitcher
+namespace MusicSwitcher.Behaviors
 {
     internal class FlightConfig
     {

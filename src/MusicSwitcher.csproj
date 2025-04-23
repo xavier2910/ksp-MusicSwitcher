@@ -4,9 +4,7 @@
         <TargetFramework>net4.8</TargetFramework>
     </PropertyGroup>
     <PropertyGroup>
-        <ModName>MusicSwitcher</ModName>
-        <RepoRootPath>$(MSBuildThisFileDirectory)/../</RepoRootPath>
-        <BinariesOutputRelativePath>GameData/$(ModName)/</BinariesOutputRelativePath>
+        <ModName>$(SolutionName)</ModName>
     </PropertyGroup>
 
     <!-- Version file config -->
@@ -26,6 +24,12 @@
             <CKANIdentifier>ModuleManager</CKANIdentifier>
         </Reference>
     </ItemGroup>
+    
+    <!-- Generate assembly attributes -->
+    <PropertyGroup>
+        <GenerateKSPAssemblyAttribute>true</GenerateKSPAssemblyAttribute>
+        <GenerateKSPAssemblyDependencyAttributes>true</GenerateKSPAssemblyDependencyAttributes>
+    </PropertyGroup>
 
     <!-- Add cleanup -->
     <Target Name="CleanRepo" AfterTargets="CoreClean">
