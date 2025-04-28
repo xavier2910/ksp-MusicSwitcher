@@ -43,7 +43,7 @@ namespace MusicSwitcher {
                 ConfigNode node = url.config;
                 var cfg = ConfigNode.CreateObjectFromConfig<MusicControllerConfig>(node);
 
-                MusicController created = NewMusicController(cfg);
+                IController created = NewMusicController(cfg);
                 if (created == null) {
                     Log.Warning($"failed to load config for {cfg.debugName}!", logTag);
                     continue;
@@ -56,15 +56,15 @@ namespace MusicSwitcher {
             Log.Message($"loaded {loadedcfgs}/{foundcfgs} flight configs", logTag);
         }
 
-        private MusicController NewMusicController(MusicControllerConfig cfg) {
+        private IController NewMusicController(MusicControllerConfig cfg) {
 
-            MusicController mc = null;
+            IController mc = null;
             
             try {
                 mc = (Type.GetType(cfg.typeName)
                          .GetConstructor(new Type[]{typeof(AudioSourceWrangler)})
                          .Invoke(new System.Object[]{Statics.switcherInstance.SourceWrangler})
-                     ) as MusicController;
+                     ) as IController;
             } catch (Exception e) {
                 Log.Error($"for {cfg.debugName}: type {cfg.typeName} is inaccessible!", logTag);
                 Log.Debug($"error: {e}", logTag);

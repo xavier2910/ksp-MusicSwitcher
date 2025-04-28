@@ -11,7 +11,7 @@ namespace MusicSwitcher {
     /// </summary>
     public class MusicSwitcher : MonoBehaviour {
 
-        private List<MusicController> activeControllers;
+        private List<IController> activeControllers;
         private StockMusicExtractor extractor;
         private bool usingStockMusic = false;
 
@@ -32,7 +32,7 @@ namespace MusicSwitcher {
         }
 
         private void Start() {
-            activeControllers = new List<MusicController>();
+            activeControllers = new List<IController>();
             SourceWrangler = new AudioSourceWrangler(gameObject);
         }
 
@@ -52,7 +52,7 @@ namespace MusicSwitcher {
         #endregion
         #region PublicMethods
 
-        public void Register(MusicController ctlr) {
+        public void Register(IController ctlr) {
             activeControllers.Add(ctlr);
         }
 

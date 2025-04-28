@@ -5,15 +5,15 @@ about config-writing or any such things.
 
 ## Overview
 
-There are three broad chunks of this program: the `MusicSwitcher`, its `MusicController`s, and the "Behaviors" that create the
+There are three broad chunks of this program: the `MusicSwitcher`, its music `IController`s, and the "Behaviors" that create the
 latter at runtime. The `MusicSwitcher` takes care of the relevant `AudioSource`s and the application of global settings to them.
-`MusicController` is an interface; they control the actual playing (or not) of `AudioClip`s. The job of a "Behavior" (it's a
-bad name; I really need a better term for this. "Configurators"?) is to create and configure the various `MusicController`s
+`IController` is an interface; they control the actual playing (or not) of `AudioClip`s. The job of a "Behavior" (it's a
+bad name; I really need a better term for this. "Configurators"?) is to create and configure the various `IController`s
 and give them to the `MusicSwitcher`.
 
 ## The `MusicSwitcher`
 
-## The `MusicController` interface
+## The `IController` interface
 
 ## "Behaviors"
 

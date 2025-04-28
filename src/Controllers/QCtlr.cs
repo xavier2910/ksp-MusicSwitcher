@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using Log = KSPBuildTools.Log;
 
-namespace MusicSwitcher {    
+namespace MusicSwitcher.Controllers {
     /// <summary>
     /// A Controller for a simple music queue.
     /// </summary>
-    internal class QCtlr : MusicController
+    internal class QCtlr : IController
     {
         private AudioSource src;
         private AudioSourceWrangler srcWrangler;
@@ -16,14 +16,16 @@ namespace MusicSwitcher {
 
         public QCtlr(AudioSourceWrangler srcWrangler)
         {
-            this.src = srcWrangler.Get();
+            src = srcWrangler.Get();
             this.srcWrangler = srcWrangler;
             src.volume = Statics.globalSettings.volumeMaster;
             clipQ = new Queue<AudioClip>();
         }
 
-        public void Update() {
-            if (active && IsReadyForNextTrack()) {
+        public void Update()
+        {
+            if (active && IsReadyForNextTrack())
+            {
                 PlayNextTrack();
             }
         }
@@ -36,19 +38,23 @@ namespace MusicSwitcher {
         /// <summary>
         /// Watch out, does NO nullchecks
         /// </summary>
-        private void PlayNextTrack() {
+        private void PlayNextTrack()
+        {
             var next = clipQ.Dequeue();
             src.clip = next;
             src.Play();
         }
 
-        public void Add(AudioClip t) {
-            if (active) {
+        public void Add(AudioClip t)
+        {
+            if (active)
+            {
                 clipQ.Enqueue(t);
             }
         }
 
-        public void Close() {
+        public void Close()
+        {
             src.Stop();
             clipQ.Clear();
             active = false;
@@ -66,7 +72,8 @@ namespace MusicSwitcher {
         }
 
         /// <param name="vol">should be on [0,1]</param>
-        public void SetVolume(float vol) {
+        public void SetVolume(float vol)
+        {
             src.volume = vol * Statics.globalSettings.volumeMaster;
         }
     }
