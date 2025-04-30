@@ -7,16 +7,21 @@ namespace MusicSwitcher.Controllers {
 
     internal class SpaceShuffle : IController {
 
-        private AudioSourceWrangler w;
+        private readonly AudioSourceWrangler w;
         private AudioSource src;
 
-        private List<AudioClip> tracks;
-        private int currentTrack = 0;
-        private bool inSpace = false;
+        private readonly List<AudioClip> tracks;
+        private int currentTrack = int.MaxValue; // set to max int to induce a shuffle immediately on play start.
+        private double spaceAltitude = 70_000.0; // TODO: demagick
+        private bool InSpace { get => FlightGlobals.ActiveVessel.orbit.referenceBody.bodyName != "Kerbin"
+                                   || FlightGlobals.ActiveVessel.orbit.altitude > spaceAltitude;
+        }
+        private bool paused = false;
 
         private bool closed = false;
 
-        private System.Random rnd;
+        private readonly System.Random rnd;
+        private readonly string logTag = "[SpaceShuffle]";
 
         public SpaceShuffle(AudioSourceWrangler w) {
             this.w = w;
@@ -29,10 +34,14 @@ namespace MusicSwitcher.Controllers {
 
         public void Add(AudioClip c) => tracks.Add(c);
 
-        public void Pause() => src.Pause();
+        public void Pause() {
+            src.Pause();
+            paused = true;
+        }
         public void UnPause() {
-            if (inSpace) {
+            if (InSpace) {
                 src.UnPause();
+                paused = false;
             }
         }
 
@@ -53,11 +62,13 @@ namespace MusicSwitcher.Controllers {
             if (closed) {
                 return;
             }
-            if (StillPlaying()) {
+            if (!InSpace) {
+                Pause();
+            }
+            if (paused) {
                 return;
             }
-            if (!inSpace) {
-                Pause();
+            if (StillPlaying()) {
                 return;
             }
 
@@ -101,7 +112,6 @@ namespace MusicSwitcher.Controllers {
         }
 
         private void OnEnterSpace(object o) {
-            inSpace = true;
             UnPause();
         }
         private void OnGamePause() => Pause();
