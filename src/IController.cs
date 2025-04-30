@@ -12,13 +12,17 @@ namespace MusicSwitcher
     /// </summary>
     public interface IController
     {
+
+        /// <summary>
+        /// called by the loader when the Controller is loaded.
+        /// </summary>
+        void Initialize(AudioSourceWrangler asw, ConfigNode cfg);
+
         /// <summary>
         /// Regular tasks. I mean, use `GameEvent`s whenever possible, but when not, do what you must.
         /// </summary>
         void Update();
 
-        void Add(AudioClip c);
-        
         void Pause();
         void UnPause();
 

@@ -11,15 +11,24 @@ namespace MusicSwitcher.Controllers {
     {
         private AudioSource src;
         private AudioSourceWrangler srcWrangler;
-        private Queue<AudioClip> clipQ;
+        private readonly Queue<AudioClip> clipQ;
         private bool active = true;
 
-        public QCtlr(AudioSourceWrangler srcWrangler)
+        public QCtlr()
         {
-            src = srcWrangler.Get();
-            this.srcWrangler = srcWrangler;
+            
             src.volume = Statics.globalSettings.volumeMaster;
             clipQ = new Queue<AudioClip>();
+        }
+
+        public void Initialize(AudioSourceWrangler w, ConfigNode node) {
+            this.srcWrangler = w;
+            src = srcWrangler.Get();
+            
+            var cfg = ConfigNode.CreateObjectFromConfig<Config.AudioList>(node);
+            foreach (var track in cfg.Load()) {
+                Add(track);
+            }
         }
 
         public void Update()

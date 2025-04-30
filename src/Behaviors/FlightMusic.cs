@@ -43,7 +43,7 @@ namespace MusicSwitcher {
                 ConfigNode node = url.config;
                 var cfg = ConfigNode.CreateObjectFromConfig<MusicControllerConfig>(node);
 
-                IController created = NewMusicController(cfg);
+                IController created = NewMusicController(node, cfg);
                 if (created == null) {
                     Log.Warning($"failed to load config for {cfg.debugName}!", logTag);
                     continue;
@@ -56,15 +56,15 @@ namespace MusicSwitcher {
             Log.Message($"loaded {loadedcfgs}/{foundcfgs} flight configs", logTag);
         }
 
-        private IController NewMusicController(MusicControllerConfig cfg) {
+        private IController NewMusicController(ConfigNode node, MusicControllerConfig cfg) {
 
             IController mc = null;
             
             try {
-                mc = (Type.GetType(cfg.typeName)
-                         .GetConstructor(new Type[]{typeof(AudioSourceWrangler)})
-                         .Invoke(new System.Object[]{Statics.switcherInstance.SourceWrangler})
-                     ) as IController;
+                mc = Type.GetType(cfg.typeName)
+                         .GetConstructor(new Type[] {})
+                         .Invoke(new object[] {})
+                      as IController;
             } catch (Exception e) {
                 Log.Error($"for {cfg.debugName}: type {cfg.typeName} is inaccessible!", logTag);
                 Log.Debug($"error: {e}", logTag);
@@ -76,29 +76,15 @@ namespace MusicSwitcher {
                 return mc;
             }
 
-            int loaded = 0;
-            foreach (string path in cfg.trackPaths) {
-                Log.Debug($"Loading clip for '{cfg.debugName}' @ {path}", logTag);
-                AudioClip clip = LoadClip(path);
-                if (clip == null) {
-                    Log.Warning($"Could not load clip for '{cfg.debugName}' @ path {path}!", logTag);
-                    continue;
-                }
-                mc.Add(clip);
-                loaded++;
-            }
 
-            Log.Message($"for {cfg.debugName}: loaded {loaded}/{cfg.trackPaths.Count} clips", logTag);
+            mc.Initialize(Statics.switcherInstance.SourceWrangler, node);
+
             return mc;
 
         }
 
         private AudioClip LoadClip(string gdb) {
-            if (GameDatabase.Instance.ExistsAudioClip(gdb)) {
-                return GameDatabase.Instance.GetAudioClip(gdb);
-            } else {
-                return null;
-            }
+            return GameDatabase.Instance.ExistsAudioClip(gdb) ? GameDatabase.Instance.GetAudioClip(gdb) : null;
         }
 
         #endregion

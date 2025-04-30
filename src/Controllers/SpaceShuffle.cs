@@ -7,7 +7,7 @@ namespace MusicSwitcher.Controllers {
 
     internal class SpaceShuffle : IController {
 
-        private readonly AudioSourceWrangler w;
+        private AudioSourceWrangler w;
         private AudioSource src;
 
         private readonly List<AudioClip> tracks;
@@ -23,13 +23,20 @@ namespace MusicSwitcher.Controllers {
         private readonly System.Random rnd;
         private readonly string logTag = "[SpaceShuffle]";
 
-        public SpaceShuffle(AudioSourceWrangler w) {
-            this.w = w;
-            src = w.Get();
+        public SpaceShuffle() {
             rnd = new System.Random();
             tracks = new List<AudioClip>();
+        }
 
+        public void Initialize(AudioSourceWrangler w, ConfigNode node) {
+            this.w = w;
+            src = w.Get();
             BindEvents();
+
+            var cfg = ConfigNode.CreateObjectFromConfig<Config.AudioList>(node);
+            foreach (var track in cfg.Load()) {
+                Add(track);
+            }
         }
 
         public void Add(AudioClip c) => tracks.Add(c);
