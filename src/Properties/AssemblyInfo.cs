@@ -25,4 +25,4 @@ using System.Runtime.InteropServices;
 
 [assembly: KSPAssembly("MusicSwitcher", 0, 0, 0)]
 // for whatever reason, MM 4.2.3 has KSPAssembly(2,5)
-[assembly: KSPAssemblyDependency("ModuleManager", 2, 5)]
+// [assembly: KSPAssemblyDependency("ModuleManager", 2, 5)]

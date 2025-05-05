@@ -20,13 +20,13 @@
         </KSPVersionFile>
     </ItemGroup>
 
-    <!-- Mod dependencies -->
+    <!-- Mod dependencies
     <ItemGroup>
         <Reference Include="$(KSPRoot)GameData/ModuleManager*.dll">
             <Private>False</Private>
             <CKANIdentifier>ModuleManager</CKANIdentifier>
         </Reference>
-    </ItemGroup>
+    </ItemGroup>-->
 
     <!-- Add cleanup -->
     <Target Name="CleanRepo" AfterTargets="CoreClean">
