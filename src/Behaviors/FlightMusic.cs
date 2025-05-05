@@ -41,7 +41,7 @@ namespace MusicSwitcher.Behaviors {
                 foundcfgs++;
 
                 ConfigNode node = url.config;
-                var cfg = ConfigNode.CreateObjectFromConfig<MusicControllerConfig>(node);
+                var cfg = ConfigNode.CreateObjectFromConfig<Config.Controller>(node);
 
                 IController created = NewMusicController(node, cfg);
                 if (created == null) {
@@ -56,7 +56,7 @@ namespace MusicSwitcher.Behaviors {
             Log.Message($"loaded {loadedcfgs}/{foundcfgs} flight configs", logTag);
         }
 
-        private IController NewMusicController(ConfigNode node, MusicControllerConfig cfg) {
+        private IController NewMusicController(ConfigNode node, Config.Controller cfg) {
 
             IController mc = null;
             

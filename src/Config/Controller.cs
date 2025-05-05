@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 
-namespace MusicSwitcher
+namespace MusicSwitcher.Config
 {
-    internal class MusicControllerConfig
+    internal class Controller
     {
         [Persistent] public string debugName = invalidPattern;
         [Persistent] public string typeName = invalidPattern;
