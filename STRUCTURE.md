@@ -13,8 +13,28 @@ and give them to the `MusicSwitcher`.
 
 ## The `MusicSwitcher`
 
+This is kind of the orchestrator of the whole thing, alongside its lackeys, `Patcher`, `SettingsLoader`, `StockMusicExtractor`, and
+`AudioSourceWrangler`. The first three are only relevant at startup: `Patcher` finds the stockMusicLogic GameObject, instantiates the
+`MusicSwitcher`, and attatches it to the MusicLogic. The `MusicSwitcher` then sets up the `StockMusicExtractor`, which extracts
+references to many of the stock music `AudioClip`s. Meanwhile, the `SettingsLoader` loads the global settings.
+
+The `MusicSwitcher` contains a variety of methods for configurating music at runtime. Part of this dance is the `AudioSourceWrangler`,
+which gets instantiated by the `MusicSwitcher` and is the way that `IController`s should get references to their `AudioSources`.
+Basically, this just keeps track of which ones are being used when so that we don't just keep creating `AudioSource` components
+all over the place every scene change/load.
+
+Lurking behind all this is `Statics`. It's just a place to hold constant plugin data that don't really belong to specific classes
+or need to be shared internally or externally. All constants or set-once's live here. Generally.
+
 ## The `IController` interface
 
+These are what can be actually configured by cfg files and do the actual lifting when it comes to the dynamic behavior of the
+music. They are sort of small, context specific \(as far as possible\) controllers for the music.
+
 ## "Behaviors"
+
+Right now these are just organized by scene. With the exception of the Flight scene "Behavior", these all simply allow the Stock
+music to just do its own thing. The FlightMusic one deserves a brief overview, however. It loads up configs for flight-time
+`IControllers` and instantiates them. That's really it. See [the config docs](CONFIGURING.md).
 
 
