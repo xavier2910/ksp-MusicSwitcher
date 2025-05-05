@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Log = KSPBuildTools.Log;
 
-namespace MusicSwitcher {
+namespace MusicSwitcher.Behaviors {
 
     [KSPAddon(KSPAddon.Startup.Flight, false)]
     internal class FlightMusic : MonoBehaviour {

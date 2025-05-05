@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace MusicSwitcher
+namespace MusicSwitcher.Behaviors
 {
     [KSPAddon(KSPAddon.Startup.MainMenu, false)]
     internal class MainMenuStockMusic : MonoBehaviour

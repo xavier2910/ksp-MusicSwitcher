@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace MusicSwitcher
+namespace MusicSwitcher.Behaviors
 {
     [KSPAddon(KSPAddon.Startup.TrackingStation, false)]
     internal class TrackingStationStockMusic : MonoBehaviour
