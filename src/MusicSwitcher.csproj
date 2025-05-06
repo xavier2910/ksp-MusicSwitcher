@@ -28,7 +28,7 @@
         </Reference>
     </ItemGroup>-->
     
-    <!-- Generate assembly attributes - NOT FUNCTIONAL -->
+    <!-- Generate assembly attributes -->
     <PropertyGroup>
         <GenerateKSPAssemblyAttribute>true</GenerateKSPAssemblyAttribute>
         <GenerateKSPAssemblyDependencyAttributes>true</GenerateKSPAssemblyDependencyAttributes>
