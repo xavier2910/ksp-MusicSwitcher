@@ -122,6 +122,7 @@ namespace MusicSwitcher.Controllers {
 
         private void OnEnterSpace(object o) {
             UnPause();
+            currentTrack = int.MaxValue; // force a re-shuffle in case the player "dips" into the atmosphere
         }
         private void OnGamePause() => Pause();
         private void OnGameUnPause() => UnPause();
