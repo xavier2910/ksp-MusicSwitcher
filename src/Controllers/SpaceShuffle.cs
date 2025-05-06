@@ -12,9 +12,11 @@ namespace MusicSwitcher.Controllers {
 
         private readonly List<AudioClip> tracks;
         private int currentTrack = int.MaxValue; // set to max int to induce a shuffle immediately on play start.
-        private double spaceAltitude = 70_000.0; // TODO: demagick
         private bool InSpace { get => FlightGlobals.ActiveVessel.orbit.referenceBody.bodyName != "Kerbin"
-                                   || FlightGlobals.ActiveVessel.orbit.altitude > spaceAltitude;
+                                   || FlightGlobals.ActiveVessel.situation == Vessel.Situations.ORBITING
+                                   || FlightGlobals.ActiveVessel.situation == Vessel.Situations.SUB_ORBITAL
+                                   || FlightGlobals.ActiveVessel.situation == Vessel.Situations.ESCAPING
+                                   || FlightGlobals.ActiveVessel.situation == Vessel.Situations.DOCKED;
         }
         private bool paused = false;
 
