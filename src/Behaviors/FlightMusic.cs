@@ -3,18 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using Log = KSPBuildTools.Log;
 
-namespace MusicSwitcher.Behaviors
-{
+namespace MusicSwitcher.Behaviors {
 
     [KSPAddon(KSPAddon.Startup.Flight, false)]
-    internal class FlightMusic : MonoBehaviour
-    {
-
-        private Dictionary<string /*condition*/, List<Track> /*to q*/> conditionalTracks
-            = new Dictionary<string, List<Track>>();
+    internal class FlightMusic : MonoBehaviour {
 
         private readonly string logTag = "[FlightMusic]";
-        private readonly int mainLayer = 0;
 
         #region UnityMessages
 
@@ -27,31 +21,11 @@ namespace MusicSwitcher.Behaviors
         private void Start()
         {
             LoadConfigs();
-            BindEvents();
         }
 
         private void OnDestroy()
         {
             Statics.switcherInstance.ClearAll();
-            ReleaseEvents();
-        }
-
-        #endregion
-        #region GameEventHandlers
-
-        private void BindEvents()
-        {
-            GameEvents.VesselSituation.onReachSpace.Add(OnEnterSpace);
-        }
-
-        private void ReleaseEvents()
-        {
-            GameEvents.VesselSituation.onReachSpace.Remove(OnEnterSpace);
-        }
-
-        private void OnEnterSpace(Vessel _)
-        {
-            QueueTrigger(nameof(OnEnterSpace));
         }
 
         #endregion
@@ -73,76 +47,46 @@ namespace MusicSwitcher.Behaviors
                 foundcfgs++;
 
                 ConfigNode node = url.config;
-                var cfg = ConfigNode.CreateObjectFromConfig<FlightConfig>(node);
+                var cfg = ConfigNode.CreateObjectFromConfig<Config.Controller>(node);
 
-                if (cfg.trigger == FlightConfig.invalidPattern)
-                {
-                    Log.Warning($"'{cfg.debugName}' has an empty or invalid 'trigger' field", logTag);
+                IController created = NewMusicController(node, cfg);
+                if (created == null) {
+                    Log.Warning($"failed to load config for {cfg.debugName}!", logTag);
                     continue;
                 }
+                Statics.switcherInstance.Register(created);
 
-                Log.Debug($"Loading clip for '{cfg.debugName}' @ {cfg.trackPath}", logTag);
-                AudioClip clip = LoadClip(cfg.trackPath);
-                if (clip == null)
-                {
-                    Log.Warning($"Could not load clip for '{cfg.debugName}' @ path {cfg.trackPath}!", logTag);
-                    continue;
-                }
-                loadedcfgs++;
-
-                EnsureTriggerExists(cfg.trigger);
-
-                conditionalTracks[cfg.trigger].Add(
-                    new Track(clip, cfg.looping)
-                );
+                loadedcfgs++;                
             }
 
-            Log.Debug($"loaded {loadedcfgs}/{foundcfgs} flight configs", logTag);
+            Log.Message($"loaded {loadedcfgs}/{foundcfgs} flight configs", logTag);
         }
 
-        private AudioClip LoadClip(string gdb)
-        {
-            if (GameDatabase.Instance.ExistsAudioClip(gdb))
-            {
-                return GameDatabase.Instance.GetAudioClip(gdb);
-            }
-            else
-            {
+        private IController NewMusicController(ConfigNode node, Config.Controller cfg) {
+
+            IController mc = null;
+            
+            try {
+                mc = Type.GetType(cfg.typeName)
+                         .GetConstructor(new Type[] {})
+                         .Invoke(new object[] {})
+                      as IController;
+            } catch (Exception e) {
+                Log.Error($"for {cfg.debugName}: type {cfg.typeName} is inaccessible!", logTag);
+                Log.Debug($"error: {e}", logTag);
                 return null;
             }
-        }
+            if (mc == null) {
+                Log.Error($"for {cfg.debugName}: type {cfg.typeName} is not a valid MusicController!", logTag);
+                Log.Message($"please ensure that {cfg.typeName} implements the MusicController interface", logTag);
+                return mc;
+            }
 
-        private void EnsureTriggerExists(string cond)
-        {
-            try
-            {
-                _ = conditionalTracks[cond];
-            }
-            catch (KeyNotFoundException)
-            {
-                conditionalTracks[cond] = new List<Track>();
-            }
-        }
 
-        private void QueueTrigger(string trigger)
-        {
-            List<Track> toQ;
+            mc.Initialize(Statics.switcherInstance.SourceWrangler, node);
 
-            try
-            {
-                toQ = conditionalTracks[trigger];
-            }
-            catch (KeyNotFoundException)
-            {
-                Log.Debug($"trigger {trigger} has no subscribers", logTag);
-                return;
-            }
-            Statics.switcherInstance.Clear(mainLayer);
+            return mc;
 
-            foreach (var track in toQ)
-            {
-                Statics.switcherInstance.Enqueue(track, mainLayer);
-            }
         }
 
         #endregion

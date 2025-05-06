@@ -12,7 +12,7 @@ namespace MusicSwitcher
 
         private string settingsPath;
         
-        public void ModuleManagerPostLoad() {
+        public void Awake() {
 
             bool settingsFileExists = true;
             settingsPath = AssemblyLoader.loadedAssemblies.GetPathByType(typeof(MusicSwitcher)) + "/";

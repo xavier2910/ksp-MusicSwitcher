@@ -5,6 +5,9 @@
     </PropertyGroup>
     <PropertyGroup>
         <ModName>$(SolutionName)</ModName>
+        <RepoRootPath>$(MSBuildThisFileDirectory)/../</RepoRootPath>
+        <BinariesOutputRelativePath>GameData/$(ModName)/</BinariesOutputRelativePath>
+        <Version>0.0.0</Version>
     </PropertyGroup>
 
     <!-- Version file config -->
@@ -17,13 +20,13 @@
         </KSPVersionFile>
     </ItemGroup>
 
-    <!-- Mod dependencies -->
+    <!-- Mod dependencies
     <ItemGroup>
         <Reference Include="$(KSPRoot)GameData/ModuleManager*.dll">
             <Private>False</Private>
             <CKANIdentifier>ModuleManager</CKANIdentifier>
         </Reference>
-    </ItemGroup>
+    </ItemGroup>-->
     
     <!-- Generate assembly attributes - NOT FUNCTIONAL -->
     <PropertyGroup>
