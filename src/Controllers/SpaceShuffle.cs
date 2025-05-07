@@ -18,7 +18,7 @@ namespace MusicSwitcher.Controllers {
                                    || FlightGlobals.ActiveVessel.situation == Vessel.Situations.ESCAPING
                                    || FlightGlobals.ActiveVessel.situation == Vessel.Situations.DOCKED;
         }
-        private bool paused = false;
+        private bool paused = true;
 
         private bool closed = false;
 
@@ -28,6 +28,7 @@ namespace MusicSwitcher.Controllers {
         public SpaceShuffle() {
             rnd = new System.Random();
             tracks = new List<AudioClip>();
+            _ = logTag;
         }
 
         public void Initialize(AudioSourceWrangler w, ConfigNode node) {
@@ -39,6 +40,10 @@ namespace MusicSwitcher.Controllers {
             foreach (var track in cfg.Load()) {
                 Add(track);
             }
+            if (tracks.Count == 0) {
+                Log.Warning($"Controller '{cfg.debugName}' has no associated tracks!", logTag);
+            }
+
         }
 
         public void Add(AudioClip c) => tracks.Add(c);
@@ -71,7 +76,10 @@ namespace MusicSwitcher.Controllers {
             if (closed) {
                 return;
             }
-            if (!InSpace) {
+            if (tracks.Count == 0) {
+
+            }
+            if (!paused && !InSpace) {
                 Pause();
             }
             if (paused) {
