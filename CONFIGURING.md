@@ -17,7 +17,7 @@ Fields common to all Flight Controllers:
   constructor. MusicSwitcher ships with a few such classes:
 
 ### SituationalShuffle
-```js
+```go
 MUSICCONTROLLER_FLIGHT
 {
     typeName = MusicSwitcher.Controllers.SituationalShuffle
@@ -41,7 +41,7 @@ MUSICCONTROLLER_FLIGHT
 ```
 
 ### SpaceShuffle
-```haskell
+```go
 MUSICCONTROLLER_FLIGHT
 {
     typeName = MusicSwitcher.Controllers.SpaceShuffle
