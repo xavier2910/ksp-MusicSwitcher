@@ -50,6 +50,7 @@ namespace MusicSwitcher {
         private AudioSource NewSource() {
             var newSource = host.AddComponent<AudioSource>();
             newSource.spatialBlend = 0.0f;
+            newSource.playOnAwake = false;
             return newSource;
         }
     }

@@ -8,7 +8,7 @@ This document lists all supported music Controllers and how to configure them.
     - [SpaceShuffle](#spaceshuffle)
     - [QCtlr](#qctlr)
 
-## MUSICCONTROLLER_FLIGHT
+## MUSICCONTROLLER\_FLIGHT
 
 Fields common to all Flight Controllers:
 * `debugName = string-here` sets an internal debug name, to identify this node in debug messages
@@ -39,6 +39,7 @@ MUSICCONTROLLER_FLIGHT
     }
 }
 ```
+Plays a shuffle of the specified music tracks while the active vessel is in the specified Vessel.Situations.
 
 ### SpaceShuffle
 ```go

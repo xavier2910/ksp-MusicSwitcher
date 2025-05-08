@@ -48,6 +48,7 @@ namespace MusicSwitcher.Behaviors {
 
                 ConfigNode node = url.config;
                 var cfg = ConfigNode.CreateObjectFromConfig<Config.Controller>(node);
+                Log.Debug($"loading {cfg.debugName}...", logTag);
 
                 IController created = NewMusicController(node, cfg);
                 if (created == null) {
