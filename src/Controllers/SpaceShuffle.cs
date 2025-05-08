@@ -77,7 +77,7 @@ namespace MusicSwitcher.Controllers {
                 return;
             }
             if (tracks.Count == 0) {
-
+                return;
             }
             if (!paused && !InSpace) {
                 Pause();
