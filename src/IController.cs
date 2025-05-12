@@ -23,9 +23,6 @@ namespace MusicSwitcher
         /// </summary>
         void Update();
 
-        void Pause();
-        void UnPause();
-
         /// <summary>
         /// Called on scene changes and the like; all operations on a `IController`
         /// should be noops after `Close()` has been called.
