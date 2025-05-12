@@ -14,9 +14,8 @@ namespace MusicSwitcher.Controllers {
         private int currentTrack = int.MaxValue; // set to max int to induce a shuffle immediately on play start.
         private Vessel.Situations TargetSituation {get; set;}
         private Vessel.Situations CurrentSituation {get => FlightGlobals.ActiveVessel.situation;}
-        private bool paused = true;
 
-        private bool closed = false;
+        private State currentState = State.INACTIVE;
 
         private readonly System.Random rnd;
         private readonly string logTag = "[SituationalShuffle]";
@@ -26,6 +25,8 @@ namespace MusicSwitcher.Controllers {
             tracks = new List<AudioClip>();
             _ = logTag;
         }
+
+        #region IController
 
         public void Initialize(AudioSourceWrangler w, ConfigNode node) {
             this.w = w;
@@ -37,71 +38,114 @@ namespace MusicSwitcher.Controllers {
                 Add(track);
             }
             if (tracks.Count == 0) {
-                Log.Warning($"Controller '{audioCfg.debugName}' has no associated tracks!", logTag);
+                Log.Error($"Controller '{audioCfg.debugName}' has no associated tracks!", logTag);
+                currentState = State.CLOSED;
+                return;
             }
 
             TargetSituation = ConfigNode.CreateObjectFromConfig<Config.Situation>(node).situation;
+
+            if (TargetSituation == CurrentSituation) {
+                currentState = State.ACTIVE;
+            }
         }
 
         public void Add(AudioClip c) => tracks.Add(c);
 
-        public void Pause() {
-            src.Pause();
-            paused = true;
-        }
-        public void UnPause() {
-            if (TargetSituation == CurrentSituation) {
-                src.UnPause();
-                paused = false;
-            }
-        }
-
         public void Close() {
-            if (closed) {
+            if (currentState == State.CLOSED) {
                 return;
             }
+
+            currentState = State.CLOSED;
 
             w.Release(src);
             src.Stop();
             src = null;
             tracks.Clear();
-            closed = true;
             ReleaseEvents();
         }
 
         public void Update() {
-            if (closed) {
-                return;
-            }
-            if (tracks.Count == 0) {
-                return;
-            }
-            if (!paused && CurrentSituation != TargetSituation) {
-                Pause();
-            } else if (paused && CurrentSituation == TargetSituation) {
-                UnPause();
-                currentTrack = int.MaxValue;
-            }
-            if (paused) {
-                return;
-            }
-            if (StillPlaying()) {
-                return;
-            }
+            UpdateState();
+            DispatchState();
+        }
 
-            if (currentTrack < tracks.Count) {
-                src.clip = tracks[currentTrack];
-                src.Play();
-                currentTrack++;
-            } else {
-                currentTrack = 0;
-                ShuffleTracks();
-                Update();
+        #endregion
+        #region StateLogic
+
+        private enum State {
+            INACTIVE,            // ie not currently in the correct state and so not playing music
+            ACTIVE,              // playing music
+            PAUSED_WHILE_ACTIVE, // game paused
+            CLOSED,              // this IController is no longer being used and should noop
+                                 // until the garbage collector comes for it
+
+            /* State Diagram:
+
+                                                        +--game paused--> PAUSED_WHILE_ACTIVE  \
+                                                        |                      |                \
+                 +------Situation becomes Target---> ACTIVE <---game unpaused--+                 }--Close()  called--> CLOSED
+                 |                                     |                                        /   or tracks empty
+             INACTIVE <--Situation stops being target--+                                       /
+
+                Note that we don't need to worry about pausing while CLOSED or INACTIVE, since those states
+                produce no sound anyway.
+            */
+        }
+
+        private void UpdateState() {
+            switch (currentState) {
+            case State.CLOSED:
+                break;
+            case State.PAUSED_WHILE_ACTIVE:
+                break;
+            case State.ACTIVE:
+                if (TargetSituation != CurrentSituation) {
+                    Deactivate();
+                }
+                break;
+            case State.INACTIVE:
+                if (TargetSituation == CurrentSituation) {
+                    Activate();
+                }
+                break;
             }
         }
 
-        private bool StillPlaying() {
-            return src.isPlaying;
+        private void Activate() {
+            currentState = State.ACTIVE;
+            currentTrack = int.MaxValue;
+        }
+
+        private void Deactivate() {
+            currentState = State.INACTIVE;
+            src.Stop();
+        }
+
+        private void DispatchState() {
+            switch (currentState) {
+            case State.CLOSED:
+                break;
+            case State.PAUSED_WHILE_ACTIVE:
+                break;
+            case State.ACTIVE:
+                if (ReadyForNextTrack()) {
+                    if (currentTrack >= tracks.Count) {
+                        ShuffleTracks();
+                        currentTrack = 0;
+                    }
+                    src.clip = tracks[currentTrack++];
+                    src.Play();
+                }
+                break;
+            case State.INACTIVE:
+                break;
+            }
+        }
+
+        private bool ReadyForNextTrack() {
+            return !src.isPlaying;
         }
 
         private void ShuffleTracks() {
@@ -114,21 +158,34 @@ namespace MusicSwitcher.Controllers {
             }
         }
 
+        private void Pause() {
+            if (currentState == State.ACTIVE) {
+                src.Pause();
+                currentState = State.PAUSED_WHILE_ACTIVE;
+            }
+        }
+
+        private void UnPause() {
+            if (currentState == State.PAUSED_WHILE_ACTIVE) {
+                src.UnPause();
+                currentState = State.ACTIVE;
+            }
+        }
+
+        #endregion
         #region Events
 
         private void BindEvents() {
-            GameEvents.onGamePause.Add(OnGamePause);
-            GameEvents.onGameUnpause.Add(OnGameUnPause);
+            GameEvents.onGamePause.Add(Pause);
+            GameEvents.onGameUnpause.Add(UnPause);
         }
 
         private void ReleaseEvents() {
-            GameEvents.onGamePause.Remove(OnGamePause);
-            GameEvents.onGameUnpause.Remove(OnGameUnPause);
+            GameEvents.onGamePause.Remove(Pause);
+            GameEvents.onGameUnpause.Remove(UnPause);
         }
 
-        private void OnGamePause() => Pause();
-        private void OnGameUnPause() => UnPause();
-
         #endregion
+
     }
 }
