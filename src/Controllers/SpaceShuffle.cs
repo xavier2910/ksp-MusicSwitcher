@@ -89,15 +89,13 @@ namespace MusicSwitcher.Controllers {
                 return;
             }
 
-            if (currentTrack < tracks.Count) {
-                src.clip = tracks[currentTrack];
-                src.Play();
-                currentTrack++;
-            } else {
+            if (currentTrack > tracks.Count) {
                 currentTrack = 0;
                 ShuffleTracks();
-                Update();
             }
+            src.clip = tracks[currentTrack];
+            src.Play();
+            currentTrack++;
         }
 
         private bool StillPlaying() {
