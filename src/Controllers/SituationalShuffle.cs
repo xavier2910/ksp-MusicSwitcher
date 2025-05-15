@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using MusicSwitcher.Util;
 using UnityEngine;
 using Log = KSPBuildTools.Log;
 
@@ -17,6 +18,8 @@ namespace MusicSwitcher.Controllers {
 
         private State currentState = State.INACTIVE;
 
+        private CoroutineManager routines;
+
         private readonly System.Random rnd;
         private readonly string logTag = "[SituationalShuffle]";
 
@@ -24,6 +27,7 @@ namespace MusicSwitcher.Controllers {
             rnd = new System.Random();
             tracks = new List<AudioClip>();
             _ = logTag;
+            routines = new CoroutineManager();
         }
 
         #region IController
@@ -69,6 +73,8 @@ namespace MusicSwitcher.Controllers {
         public void Update() {
             UpdateState();
             DispatchState();
+
+            UpdateRoutines();
         }
 
         #endregion
@@ -120,7 +126,7 @@ namespace MusicSwitcher.Controllers {
 
         private void Deactivate() {
             currentState = State.INACTIVE;
-            src.Stop();
+            routines.Add(FadeOut(.05f));
         }
 
         private void DispatchState() {
@@ -170,6 +176,29 @@ namespace MusicSwitcher.Controllers {
                 src.UnPause();
                 currentState = State.ACTIVE;
             }
+        }
+
+        #endregion
+        #region Routines
+
+        private void UpdateRoutines() {
+            routines.Update();
+        }
+
+        /// <summary>
+        /// coroutine to fade out
+        /// </summary>
+        /// <param name="delta">
+        /// fraction per frame (out of 1)
+        /// </param>
+        private IEnumerator<CoroutineState> FadeOut(float delta) {
+
+            for (float volume = 1; volume > 0; volume -= delta) {
+                src.volume = volume;
+                yield return CoroutineState.RUNNING;
+            }
+            src.Stop();
+            yield return CoroutineState.FINISHED;
         }
 
         #endregion
