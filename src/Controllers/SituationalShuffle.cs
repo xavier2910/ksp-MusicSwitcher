@@ -61,7 +61,7 @@ namespace MusicSwitcher.Controllers {
                 $"{logTag} for cfg '{audioCfg.debugName}':");
 
             fadeoutDelta = Config.Util.FloatOrDefault(
-                "fadeoutDelta", node, .0125f,
+                "fadeoutDelta", node, .05f,
                 $"{logTag} for cfg '{audioCfg.debugName}':");
         }
 

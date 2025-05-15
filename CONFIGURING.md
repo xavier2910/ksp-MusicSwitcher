@@ -32,7 +32,7 @@ MUSICCONTROLLER_FLIGHT
     // ESCAPING    =  64
     // DOCKED      = 128
     volume = float on [0,1] // OPTIONAL default 1
-    fadeoutDelta = float on [0,1] // applied per frame; small is probably good. OPTIONAL default 0.0125
+    fadeoutDelta = float on [0,1] // applied per frame; small is probably good. OPTIONAL default 0.05
     trackPaths
     {
         Item = gdb/path/to/clip
@@ -41,13 +41,14 @@ MUSICCONTROLLER_FLIGHT
     }
 }
 ```
-Plays a shuffle of the specified music tracks while the active vessel is in the specified Vessel.Situations.
+Plays a shuffle of the specified music tracks while the active vessel is in the specified Vessel.Situations. Does fading.
 
 ### SpaceShuffle
 ```go
 MUSICCONTROLLER_FLIGHT
 {
     typeName = MusicSwitcher.Controllers.SpaceShuffle
+    fadeoutDelta = float on [0,1] // applied per frame; small is probably good. OPTIONAL default 0.05
     trackPaths
     {
         Item = gdb/path/to/clip
@@ -56,7 +57,7 @@ MUSICCONTROLLER_FLIGHT
     }
 }
 ```
-Shuffles the specified tracks and plays them while the active vessel is in space, just like in stock. But your music.
+Shuffles the specified tracks and plays them while the active vessel is in space, just like in stock. But your music. Does fading.
 
 ### QCtlr
 ```go

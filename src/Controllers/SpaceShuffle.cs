@@ -11,6 +11,8 @@ namespace MusicSwitcher.Controllers {
         private AudioSourceWrangler w;
         private AudioSource src;
         private readonly CoroutineManager coroutines;
+        private float fadeoutDelta = .05f;
+        private readonly float pauseFadeDelta = .1f;
 
         private readonly List<AudioClip> tracks;
         private int currentTrack = int.MaxValue; // set to max int to induce a shuffle immediately on play start.
@@ -45,6 +47,10 @@ namespace MusicSwitcher.Controllers {
             if (tracks.Count == 0) {
                 Log.Warning($"Controller '{cfg.debugName}' has no associated tracks!", logTag);
             }
+
+            fadeoutDelta = Config.Util.FloatOrDefault(
+                "fadeoutDelta", node, .05f,
+                $"{logTag} for cfg '{cfg.debugName}':");
 
             if (InSpace) {
                 currentState = State.ACTIVE;
@@ -130,7 +136,7 @@ namespace MusicSwitcher.Controllers {
 
         private void Deactivate() {
             currentState = State.INACTIVE;
-            src.Stop();
+            coroutines.Add(FadeOut(fadeoutDelta));
         }
 
         private void DispatchState() {
@@ -174,21 +180,87 @@ namespace MusicSwitcher.Controllers {
 
         public void Pause() {
             if (currentState == State.ACTIVE) {
-                src.Pause();
-                currentState = State.PAUSED_WHILE_ACTIVE;
+                currentState = State.PAUSING;
+                coroutines.Add(PauseFade(pauseFadeDelta));
             }
         }
         public void UnPause() {
             if (currentState == State.PAUSED_WHILE_ACTIVE) {
-                src.UnPause();
-                currentState = State.ACTIVE;
+                currentState = State.UNPAUSING;
+                coroutines.Add(UnPauseFade(pauseFadeDelta));
             }
         }
 
         #endregion
         #region Coroutines
 
-        private void UpdateCoroutines() {}
+        private void UpdateCoroutines() {
+            coroutines.Update();
+        }
+
+        /// <summary>
+        /// coroutine to fade out and stop the audio source
+        /// </summary>
+        /// <param name="delta">
+        /// fraction per frame (out of 1)
+        /// </param>
+        private IEnumerator<CoroutineState> FadeOut(float delta) {
+
+            for (float vol = 1f; vol > 0f; vol -= delta) {
+                SetVolume(vol);
+                Log.Debug($"set volume to {vol * 100}%", logTag);
+                yield return CoroutineState.RUNNING;
+            }
+            src.Stop();
+            Log.Debug("stopping audio source", logTag);
+            yield return CoroutineState.FINISHED;
+        }
+
+        /// <summary>
+        /// coroutine to fade out and pause the audio source
+        /// </summary>
+        /// <param name="delta">
+        /// fraction per frame (out of 1)
+        /// </param>
+        private IEnumerator<CoroutineState> PauseFade(float delta) {
+
+            for (float vol = 1f; vol > 0f; vol -= delta) {
+                SetVolume(vol);
+                Log.Debug($"set volume to {vol * 100}%", logTag);
+                yield return CoroutineState.RUNNING;
+            }
+            src.Pause();
+            Log.Debug("pausing audio source", logTag);
+            currentState = State.PAUSED_WHILE_ACTIVE;
+            yield return CoroutineState.FINISHED;
+        }
+
+        /// <summary>
+        /// coroutine to unpause and fade in the audio source
+        /// </summary>
+        /// <param name="delta">
+        /// fraction per frame (out of 1)
+        /// </param>
+        private IEnumerator<CoroutineState> UnPauseFade(float delta) {
+            SetVolume(0f);
+            src.UnPause();
+            Log.Debug("unpausing audio source", logTag);
+
+            for (float vol = 0f; vol < 1f; vol += delta) {
+                SetVolume(vol);
+                Log.Debug($"set volume to {vol * 100}%", logTag);
+                yield return CoroutineState.RUNNING;
+            }
+
+            SetVolume(1f);
+            Log.Debug($"set volume to 100%", logTag);
+            currentState = State.ACTIVE;
+            yield return CoroutineState.FINISHED;
+        }
+
+        private void SetVolume(float vol) {
+            src.volume = vol * Statics.globalSettings.volumeMaster;
+        }
 
         #endregion
         #region Events
