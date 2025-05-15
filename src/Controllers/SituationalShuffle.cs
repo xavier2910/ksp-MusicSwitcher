@@ -12,6 +12,7 @@ namespace MusicSwitcher.Controllers {
         private AudioSource src;
 
         private float volume = 1f;
+        private float fadeoutDelta = 0.025f;
         private readonly List<AudioClip> tracks;
         private int currentTrack = int.MaxValue; // set to max int to induce a shuffle immediately on play start.
         private Vessel.Situations TargetSituation {get; set;}
@@ -54,15 +55,14 @@ namespace MusicSwitcher.Controllers {
                 currentState = State.ACTIVE;
             }
 
-            try {
-                volume = Config.Util.Float("volume", node);
-            } catch (ArgumentException) {
-                // ignore silently an absent volume field, only log warning if present but invalid
-                volume = 1f;
-            } catch (Exception e) {
-                Log.Warning($"could not parse volume for config '{audioCfg.debugName}': {e.Message}!");
-                volume = 1f;
-            }
+            volume = Config.Util.FloatOrDefault(
+                "fadeoutDelta", node, 1f,
+                $"{logTag} for cfg '{audioCfg.debugName}':");
+
+            fadeoutDelta = Config.Util.FloatOrDefault(
+                "fadeoutDelta", node, .0125f,
+                $"{logTag} for cfg '{audioCfg.debugName}':");
+
         }
 
         public void Add(AudioClip c) => tracks.Add(c);
@@ -138,7 +138,7 @@ namespace MusicSwitcher.Controllers {
 
         private void Deactivate() {
             currentState = State.INACTIVE;
-            routines.Add(FadeOut(.05f));
+            routines.Add(FadeOut(fadeoutDelta));
         }
 
         private void DispatchState() {

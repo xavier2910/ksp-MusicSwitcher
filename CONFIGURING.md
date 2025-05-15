@@ -31,6 +31,8 @@ MUSICCONTROLLER_FLIGHT
     // ORBITING    =  32
     // ESCAPING    =  64
     // DOCKED      = 128
+    volume = float on [0,1] // OPTIONAL default 1
+    fadeoutDelta = float on [0,1] // applied per frame; small is probably good. OPTIONAL default 0.0125
     trackPaths
     {
         Item = gdb/path/to/clip
