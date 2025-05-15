@@ -12,7 +12,7 @@ namespace MusicSwitcher.Controllers {
         private AudioSource src;
 
         private float volume = 1f;
-        private float fadeoutDelta = 0.025f;
+        private float fadeoutDelta = .05f;
         private readonly List<AudioClip> tracks;
         private int currentTrack = int.MaxValue; // set to max int to induce a shuffle immediately on play start.
         private Vessel.Situations TargetSituation {get; set;}
@@ -56,13 +56,12 @@ namespace MusicSwitcher.Controllers {
             }
 
             volume = Config.Util.FloatOrDefault(
-                "fadeoutDelta", node, 1f,
+                "volume", node, 1f,
                 $"{logTag} for cfg '{audioCfg.debugName}':");
 
             fadeoutDelta = Config.Util.FloatOrDefault(
                 "fadeoutDelta", node, .0125f,
                 $"{logTag} for cfg '{audioCfg.debugName}':");
-
         }
 
         public void Add(AudioClip c) => tracks.Add(c);
@@ -207,9 +206,11 @@ namespace MusicSwitcher.Controllers {
 
             for (float volume = 1; volume > 0; volume -= delta) {
                 SetVolume(volume * this.volume);
+                Log.Debug($"set volume to {volume * 100}%", logTag);
                 yield return CoroutineState.RUNNING;
             }
             src.Stop();
+            Log.Debug("stopping audio source", logTag);
             yield return CoroutineState.FINISHED;
         }
 
