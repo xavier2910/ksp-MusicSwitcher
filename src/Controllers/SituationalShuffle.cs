@@ -13,6 +13,7 @@ namespace MusicSwitcher.Controllers {
 
         private float volume = 1f;
         private float fadeoutDelta = .05f;
+        private readonly float pauseFadeDelta = .1f;
         private readonly List<AudioClip> tracks;
         private int currentTrack = int.MaxValue; // set to max int to induce a shuffle immediately on play start.
         private Vessel.Situations TargetSituation {get; set;}
@@ -94,15 +95,17 @@ namespace MusicSwitcher.Controllers {
             INACTIVE,            // ie not currently in the correct state and so not playing music
             ACTIVE,              // playing music
             PAUSED_WHILE_ACTIVE, // game paused
+            PAUSING,
+            UNPAUSING,
             CLOSED,              // this IController is no longer being used and should noop
                                  // until the garbage collector comes for it
 
             /* State Diagram:
-
+                                                            PAUSING
                                                         +--game paused--> PAUSED_WHILE_ACTIVE  \
                                                         |                      |                \
                  +------Situation becomes Target---> ACTIVE <---game unpaused--+                 }--Close()  called--> CLOSED
-                 |                                     |                                        /   or tracks empty
+                 |                                     |         UNPAUSING                      /   or tracks empty
              INACTIVE <--Situation stops being target--+                                       /
 
                 Note that we don't need to worry about pausing while CLOSED or INACTIVE, since those states
@@ -112,20 +115,24 @@ namespace MusicSwitcher.Controllers {
 
         private void UpdateState() {
             switch (currentState) {
-            case State.CLOSED:
-                break;
-            case State.PAUSED_WHILE_ACTIVE:
-                break;
-            case State.ACTIVE:
-                if (TargetSituation != CurrentSituation) {
-                    Deactivate();
-                }
-                break;
-            case State.INACTIVE:
-                if (TargetSituation == CurrentSituation) {
-                    Activate();
-                }
-                break;
+                case State.CLOSED:
+                    break;
+                case State.PAUSING:
+                    break;
+                case State.UNPAUSING:
+                    break;
+                case State.PAUSED_WHILE_ACTIVE:
+                    break;
+                case State.ACTIVE:
+                    if (TargetSituation != CurrentSituation) {
+                        Deactivate();
+                    }
+                    break;
+                case State.INACTIVE:
+                    if (TargetSituation == CurrentSituation) {
+                        Activate();
+                    }
+                    break;
             }
         }
 
@@ -142,27 +149,31 @@ namespace MusicSwitcher.Controllers {
 
         private void DispatchState() {
             switch (currentState) {
-            case State.CLOSED:
-                break;
-            case State.PAUSED_WHILE_ACTIVE:
-                break;
-            case State.ACTIVE:
-                if (ReadyForNextTrack()) {
-                    if (currentTrack >= tracks.Count) {
-                        ShuffleTracks();
-                        currentTrack = 0;
+                case State.CLOSED:
+                    break;
+                case State.PAUSED_WHILE_ACTIVE:
+                    break;
+                case State.PAUSING:
+                    break;
+                case State.UNPAUSING:
+                    break;
+                case State.ACTIVE:
+                    if (ReadyForNextTrack()) {
+                        if (currentTrack >= tracks.Count) {
+                            ShuffleTracks();
+                            currentTrack = 0;
+                        }
+                        src.clip = tracks[currentTrack++];
+                        src.Play();
                     }
-                    src.clip = tracks[currentTrack++];
-                    src.Play();
-                }
-                break;
-            case State.INACTIVE:
-                break;
+                    break;
+                case State.INACTIVE:
+                    break;
             }
         }
 
         private bool ReadyForNextTrack() {
-            return !src.isPlaying;
+            return !src.isPlaying && currentState == State.ACTIVE;
         }
 
         private void ShuffleTracks() {
@@ -176,16 +187,16 @@ namespace MusicSwitcher.Controllers {
         }
 
         private void Pause() {
-            if (currentState == State.ACTIVE) {
-                src.Pause();
-                currentState = State.PAUSED_WHILE_ACTIVE;
+            if (currentState == State.ACTIVE || currentState == State.UNPAUSING) {
+                routines.Add(PauseFade(pauseFadeDelta));
+                currentState = State.PAUSING;
             }
         }
 
         private void UnPause() {
-            if (currentState == State.PAUSED_WHILE_ACTIVE) {
-                src.UnPause();
-                currentState = State.ACTIVE;
+            if (currentState == State.PAUSED_WHILE_ACTIVE || currentState == State.PAUSING) {
+                routines.Add(UnPauseFade(pauseFadeDelta));
+                currentState = State.UNPAUSING;
             }
         }
 
@@ -197,20 +208,62 @@ namespace MusicSwitcher.Controllers {
         }
 
         /// <summary>
-        /// coroutine to fade out
+        /// coroutine to fade out and stop the audio source
         /// </summary>
         /// <param name="delta">
         /// fraction per frame (out of 1)
         /// </param>
         private IEnumerator<CoroutineState> FadeOut(float delta) {
 
-            for (float volume = 1; volume > 0; volume -= delta) {
-                SetVolume(volume * this.volume);
-                Log.Debug($"set volume to {volume * 100}%", logTag);
+            for (float vol = 1f; vol > 0f; vol -= delta) {
+                SetVolume(vol * this.volume);
+                Log.Debug($"set volume to {vol * 100}%", logTag);
                 yield return CoroutineState.RUNNING;
             }
             src.Stop();
             Log.Debug("stopping audio source", logTag);
+            yield return CoroutineState.FINISHED;
+        }
+
+        /// <summary>
+        /// coroutine to fade out and pause the audio source
+        /// </summary>
+        /// <param name="delta">
+        /// fraction per frame (out of 1)
+        /// </param>
+        private IEnumerator<CoroutineState> PauseFade(float delta) {
+
+            for (float vol = 1f; vol > 0f; vol -= delta) {
+                SetVolume(vol * this.volume);
+                Log.Debug($"set volume to {vol * 100}%", logTag);
+                yield return CoroutineState.RUNNING;
+            }
+            src.Pause();
+            Log.Debug("pausing audio source", logTag);
+            currentState = State.PAUSED_WHILE_ACTIVE;
+            yield return CoroutineState.FINISHED;
+        }
+
+        /// <summary>
+        /// coroutine to unpause and fade in the audio source
+        /// </summary>
+        /// <param name="delta">
+        /// fraction per frame (out of 1)
+        /// </param>
+        private IEnumerator<CoroutineState> UnPauseFade(float delta) {
+            SetVolume(0f);
+            src.UnPause();
+            Log.Debug("unpausing audio source", logTag);
+
+            for (float vol = 0f; vol < 1f; vol += delta) {
+                SetVolume(vol * this.volume);
+                Log.Debug($"set volume to {vol * 100}%", logTag);
+                yield return CoroutineState.RUNNING;
+            }
+
+            SetVolume(volume);
+            Log.Debug($"set volume to 100%", logTag);
+            currentState = State.ACTIVE;
             yield return CoroutineState.FINISHED;
         }
 

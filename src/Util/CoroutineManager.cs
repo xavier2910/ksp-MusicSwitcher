@@ -1,7 +1,4 @@
-using System;
 using System.Collections.Generic;
-using UnityEngine;
-using Log = KSPBuildTools.Log;
 
 namespace MusicSwitcher.Util {
     internal class CoroutineManager {
