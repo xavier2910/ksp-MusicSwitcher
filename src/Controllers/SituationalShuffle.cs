@@ -11,6 +11,7 @@ namespace MusicSwitcher.Controllers {
         private AudioSourceWrangler w;
         private AudioSource src;
 
+        private float volume = 1f;
         private readonly List<AudioClip> tracks;
         private int currentTrack = int.MaxValue; // set to max int to induce a shuffle immediately on play start.
         private Vessel.Situations TargetSituation {get; set;}
@@ -18,7 +19,7 @@ namespace MusicSwitcher.Controllers {
 
         private State currentState = State.INACTIVE;
 
-        private CoroutineManager routines;
+        private readonly CoroutineManager routines;
 
         private readonly System.Random rnd;
         private readonly string logTag = "[SituationalShuffle]";
@@ -51,6 +52,16 @@ namespace MusicSwitcher.Controllers {
 
             if (TargetSituation == CurrentSituation) {
                 currentState = State.ACTIVE;
+            }
+
+            try {
+                volume = Config.Util.Float("volume", node);
+            } catch (ArgumentException) {
+                // ignore silently an absent volume field, only log warning if present but invalid
+                volume = 1f;
+            } catch (Exception e) {
+                Log.Warning($"could not parse volume for config '{audioCfg.debugName}': {e.Message}!");
+                volume = 1f;
             }
         }
 
@@ -122,6 +133,7 @@ namespace MusicSwitcher.Controllers {
         private void Activate() {
             currentState = State.ACTIVE;
             currentTrack = int.MaxValue;
+            SetVolume(volume);
         }
 
         private void Deactivate() {
@@ -194,11 +206,15 @@ namespace MusicSwitcher.Controllers {
         private IEnumerator<CoroutineState> FadeOut(float delta) {
 
             for (float volume = 1; volume > 0; volume -= delta) {
-                src.volume = volume;
+                SetVolume(volume * this.volume);
                 yield return CoroutineState.RUNNING;
             }
             src.Stop();
             yield return CoroutineState.FINISHED;
+        }
+
+        private void SetVolume(float vol) {
+            src.volume = vol * Statics.globalSettings.volumeMaster;
         }
 
         #endregion
