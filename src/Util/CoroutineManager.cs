@@ -7,9 +7,11 @@ namespace MusicSwitcher.Util {
     internal class CoroutineManager {
 
         private List<IEnumerator<CoroutineState>> routines;
+        private Stack<IEnumerator<CoroutineState>> toRemove;
 
         public CoroutineManager() {
-            routines = new List<IEnumerator<CoroutineState>>(0);
+            routines = new List<IEnumerator<CoroutineState>>();
+            toRemove = new Stack<IEnumerator<CoroutineState>>();
         }
 
         public void Add(IEnumerator<CoroutineState> routine) {
@@ -22,15 +24,18 @@ namespace MusicSwitcher.Util {
                 var state = routine.Current;
                 switch (state) {
                 case CoroutineState.FINISHED:
-                    routines.Remove(routine);
+                    toRemove.Push(routine);
                     break;
                 case CoroutineState.RUNNING:
-                    routine.MoveNext();
+                    _ = routine.MoveNext();
                     break;
                 }
             }
-        }
 
+            while (toRemove.Count > 0) {
+                _ = routines.Remove(toRemove.Pop());
+            }
+        }
     }
 
     internal enum CoroutineState {

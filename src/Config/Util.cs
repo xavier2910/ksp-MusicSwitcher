@@ -27,7 +27,20 @@ namespace MusicSwitcher.Config {
             try {
                 return float.Parse(node.GetValue(name));
             } catch (Exception) {
-                throw new ArgumentException($"{name} is not a double");
+                throw new ArgumentException($"{name} is not a float");
+            }
+        }
+
+        public static float FloatOrDefault(string name, ConfigNode node, float def, string logTag) {
+            if (!node.HasValue(name)) {
+                return def;
+            }
+
+            try {
+                return float.Parse(node.GetValue(name));
+            } catch (Exception) {
+                Log.Error($"{name} is not a float", logTag);
+                return def;
             }
         }
     }
