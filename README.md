@@ -5,7 +5,8 @@ have them (or KSP on Steam) so I can't test it out.
 
 >[!NOTE]
 >This plugin is designed to allow configuration of in-game music. It does not come with any music
->and is meant only to be a dependency for music/soundtrack mods.
+>and is meant only to be a dependency for music/soundtrack mods, such as the in-developement
+>[KSP Soundtrack Remastered](https://forum.kerbalspaceprogram.com/topic/227639-ksp-soundtrack-remastered)
 
 ## Configuring
 

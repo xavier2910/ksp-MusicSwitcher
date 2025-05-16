@@ -1,12 +1,12 @@
 # Mod Structure
 
 This is about the internal structure of the mod code, meant for folks who want to write code. This is not
-about config-writing or any such things.
+about config-writing or any such things. For those things, see [the config docs](CONFIGURING.md).
 
 ## Overview
 
 There are three broad chunks of this program: the `MusicSwitcher`, its music `IController`s, and the "Behaviors" that create the
-latter at runtime. The `MusicSwitcher` takes care of the relevant `AudioSource`s and the application of global settings to them.
+latter at runtime. The `MusicSwitcher` takes care of the relevant `AudioSource`s and the dis-/enabling of the stock music.
 `IController` is an interface; they control the actual playing (or not) of `AudioClip`s. The job of a "Behavior" (it's a
 bad name; I really need a better term for this. "Configurators"?) is to create and configure the various `IController`s
 and give them to the `MusicSwitcher`.
@@ -14,7 +14,7 @@ and give them to the `MusicSwitcher`.
 ## The `MusicSwitcher`
 
 This is kind of the orchestrator of the whole thing, alongside its lackeys, `Patcher`, `SettingsLoader`, `StockMusicExtractor`, and
-`AudioSourceWrangler`. The first three are only relevant at startup: `Patcher` finds the stockMusicLogic GameObject, instantiates the
+`AudioSourceWrangler`. The first three are only relevant at startup: `Patcher` finds the StockMusicLogic GameObject, instantiates the
 `MusicSwitcher`, and attatches it to the MusicLogic. The `MusicSwitcher` then sets up the `StockMusicExtractor`, which extracts
 references to many of the stock music `AudioClip`s. Meanwhile, the `SettingsLoader` loads the global settings.
 
@@ -28,7 +28,7 @@ or need to be shared internally or externally. All constants or set-once's live 
 
 ## The `IController` interface
 
-These are what can be actually configured by cfg files and do the actual lifting when it comes to the dynamic behavior of the
+These are what can be actually configured by .cfg files and do the actual lifting when it comes to the dynamic behavior of the
 music. They are sort of small, context specific \(as far as possible\) controllers for the music.
 
 ## "Behaviors"
@@ -36,5 +36,3 @@ music. They are sort of small, context specific \(as far as possible\) controlle
 Right now these are just organized by scene. With the exception of the Flight scene "Behavior", these all simply allow the Stock
 music to just do its own thing. The FlightMusic one deserves a brief overview, however. It loads up configs for flight-time
 `IControllers` and instantiates them. That's really it. See [the config docs](CONFIGURING.md).
-
-

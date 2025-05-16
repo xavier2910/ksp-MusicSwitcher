@@ -7,8 +7,9 @@ Ideally you want to have git, too.
 
 To build:
 
-* Make sure you have all [dependencies](#dependencies) installed to the KSP you are going to install
+* Make sure you have all [dependencies](README.md#dependencies) installed to the KSP you are going to install
   MusicSwitcher to. If you have CKAN, it will automatically install dependencies from CKAN.
+  \(At the moment there are none :\)
 * clone the repo using git (recommended) or download the source zip.
 * In the `src/` directory, create the file `MusicSwitcher.csproj.user` and type the following into it:
 ```xml
@@ -27,13 +28,13 @@ To build:
     run `ln -s /path/to/ksp-MusicSwitcher/GameData/MusicSwitcher`
   * On Windows, cd \(or open a new terminal, idc\) into your GameData folder \(the KSP one\) and
     run `mklink /j MusicSwitcher "P:\ath\to\ksp-MusicSwitcher\GameData\MusicSwitcher`
-  * On Mac, consult google or your nearest computer dealer.
+  * On Mac, consult google or your nearest computer dealer. \(You can probably run the Linux command\.)
   * Or, of course, you could just copy the MusicSwitcher folder into your GameData instead of making
-    a link.
+    a link. But that'll become a hassle real quick.
 
 Congrats; you have now installed MusicSwitcher! Enjoy.
 
 >[!IMPORTANT]
 >**If you, for whatever reason, cannot install the dotnet SDK on your machine, never fear!** You can simply use msbuild from
->Mono like so: `msbuild src/MusicSwitcher.csproj -t:restore` followed by `msbuild src/MusicSwitcher.csproj` to restore
+>Mono like so: `msbuild src/MusicSwitcher.csproj -t:restore` followed by `msbuild src/MusicSwitcher.csproj` to install
 >Nuget packages and then build the plugin.

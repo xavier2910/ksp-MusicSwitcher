@@ -11,7 +11,7 @@ This document lists all supported music Controllers and how to configure them.
 ## MUSICCONTROLLER\_FLIGHT
 
 Fields common to all Flight Controllers:
-* `debugName = string-here` sets an internal debug name, to identify this node in debug messages
+* `debugName = string-here` sets an internal debug name, to identify this controller in debug messages
 * `typeName = Name.Space.Class` indicates the *fully qualified* name of the class to instantiate for
   this node \(via reflection\). This class **MUST** implement `IController` and **MUST** have a default
   constructor. MusicSwitcher ships with a few such classes:
@@ -31,8 +31,8 @@ MUSICCONTROLLER_FLIGHT
     // ORBITING    =  32
     // ESCAPING    =  64
     // DOCKED      = 128
-    volume = float on [0,1] // OPTIONAL default 1
-    fadeoutDelta = float on [0,1] // applied per frame; small is probably good. OPTIONAL default 0.05
+    volume = <float on [0,1]> // OPTIONAL default 1
+    fadeoutDelta = <float on [0,1]> // applied per frame; small is probably good. OPTIONAL default 0.05
     trackPaths
     {
         Item = gdb/path/to/clip
@@ -48,7 +48,7 @@ Plays a shuffle of the specified music tracks while the active vessel is in the 
 MUSICCONTROLLER_FLIGHT
 {
     typeName = MusicSwitcher.Controllers.SpaceShuffle
-    fadeoutDelta = float on [0,1] // applied per frame; small is probably good. OPTIONAL default 0.05
+    fadeoutDelta = <float on [0,1]> // applied per frame; small is probably good. OPTIONAL default 0.05
     trackPaths
     {
         Item = gdb/path/to/clip
