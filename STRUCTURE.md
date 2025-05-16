@@ -5,12 +5,9 @@ about config-writing or any such things. For those things, see [the config docs]
 
 ## Overview
 
-There are three broad chunks of this program: the `MusicSwitcher`, its music `IController`s, and the "Behaviors" that create the
-latter at runtime. The `MusicSwitcher` takes care of the relevant `AudioSource`s and the dis-/enabling of the stock music.
-`IController` is an interface; they control the actual playing (or not) of `AudioClip`s. The job of a "Behavior" (it's a
-bad name; I really need a better term for this. "Configurators"?) is to create and configure the various `IController`s
-and give them to the `MusicSwitcher`.
-
+There are three broad chunks of this program: the `MusicSwitcher`, its music `IController`s, and the `ControllerLoader` that
+creates the latter at runtime. The `MusicSwitcher` takes care of the relevant `AudioSource`s and the dis-/enabling of the stock music.
+`IController` is an interface; they control the actual playing (or not) of `AudioClip`s. 
 ## The `MusicSwitcher`
 
 This is kind of the orchestrator of the whole thing, alongside its lackeys, `Patcher`, `SettingsLoader`, `StockMusicExtractor`, and
@@ -31,8 +28,7 @@ or need to be shared internally or externally. All constants or set-once's live 
 These are what can be actually configured by .cfg files and do the actual lifting when it comes to the dynamic behavior of the
 music. They are sort of small, context specific \(as far as possible\) controllers for the music.
 
-## "Behaviors"
+## The `ControllerLoader`
 
-Right now these are just organized by scene. With the exception of the Flight scene "Behavior", these all simply allow the Stock
-music to just do its own thing. The FlightMusic one deserves a brief overview, however. It loads up configs for flight-time
-`IControllers` and instantiates them. That's really it. See [the config docs](CONFIGURING.md).
+This assembles its own record of all the `IController` configs on startup and then takes care of instantiating them at the
+right time.

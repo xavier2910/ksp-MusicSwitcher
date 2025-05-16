@@ -132,6 +132,7 @@ namespace MusicSwitcher.Controllers {
         private void Activate() {
             currentState = State.ACTIVE;
             currentTrack = int.MaxValue;
+            SetVolume(1f);
         }
 
         private void Deactivate() {
