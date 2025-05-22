@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Log = KSPBuildTools.Log;
 
-namespace MusicSwitcher.Controllers {
+namespace MusicSwitcher.Controller {
     /// <summary>
     /// A Controller for a simple music queue.
     /// </summary>

@@ -4,58 +4,67 @@ using MusicSwitcher.Util;
 using UnityEngine;
 using Log = KSPBuildTools.Log;
 
-namespace MusicSwitcher.Controllers {
+namespace MusicSwitcher.Controller {
 
-    internal class SpaceShuffle : IController {
+    internal class SituationalShuffle : IController {
 
         private AudioSourceWrangler w;
         private AudioSource src;
-        private readonly CoroutineManager coroutines;
+
+        private float volume = 1f;
         private float fadeoutDelta = .05f;
         private readonly float pauseFadeDelta = .1f;
-
         private readonly List<AudioClip> tracks;
         private int currentTrack;
+        private Vessel.Situations TargetSituation {get; set;}
+        private Vessel.Situations CurrentSituation {get => FlightGlobals.ActiveVessel.situation;}
+
         private State currentState;
-        private bool InSpace { get => FlightGlobals.ActiveVessel.orbit.referenceBody.bodyName != "Kerbin"
-                                   || FlightGlobals.ActiveVessel.situation == Vessel.Situations.ORBITING
-                                   || FlightGlobals.ActiveVessel.situation == Vessel.Situations.SUB_ORBITAL
-                                   || FlightGlobals.ActiveVessel.situation == Vessel.Situations.ESCAPING
-                                   || FlightGlobals.ActiveVessel.situation == Vessel.Situations.DOCKED;
-        }
+
+        private readonly CoroutineManager routines;
 
         private readonly System.Random rnd;
-        private readonly string logTag = "[SpaceShuffle]";
+        private readonly string logTag = "[SituationalShuffle]";
 
-        public SpaceShuffle() {
+        public SituationalShuffle() {
             rnd = new System.Random();
             tracks = new List<AudioClip>();
             _ = logTag;
-            coroutines = new CoroutineManager();
+            routines = new CoroutineManager();
         }
 
         #region IController
+
         public void Initialize(AudioSourceWrangler w, ConfigNode node) {
             this.w = w;
             src = w.Get();
             BindEvents();
 
-            var cfg = ConfigNode.CreateObjectFromConfig<Config.AudioList>(node);
-            foreach (var track in cfg.Load()) {
+            var audioCfg = ConfigNode.CreateObjectFromConfig<Config.AudioList>(node);
+            foreach (var track in audioCfg.Load()) {
                 Add(track);
             }
             if (tracks.Count == 0) {
-                Log.Warning($"Controller '{cfg.debugName}' has no associated tracks!", logTag);
+                Log.Error($"Controller '{audioCfg.debugName}' has no associated tracks!", logTag);
+                currentState = State.CLOSED;
+                return;
             }
+
+            TargetSituation = ConfigNode.CreateObjectFromConfig<Config.Situation>(node).situation;
+
+            volume = Config.Util.FloatOrDefault(
+                "volume", node, 1f,
+                $"{logTag} for cfg '{audioCfg.debugName}':");
 
             fadeoutDelta = Config.Util.FloatOrDefault(
                 "fadeoutDelta", node, .05f,
-                $"{logTag} for cfg '{cfg.debugName}':");
+                $"{logTag} for cfg '{audioCfg.debugName}':");
 
-            if (InSpace) {
-                Activate(); // call activate to set volume, induce shuffle, etc
+            if (TargetSituation == CurrentSituation) {
+                Activate(); // activate to induce shuffle, set volume, etc
             } else {
-                currentState = State.INACTIVE; // we don't need Deactivate()'s fadeout
+                // don't deactivate because deactivate does a fadeout. instead just set state (deactivate does nothing else)
+                currentState = State.INACTIVE;
             }
         }
 
@@ -66,11 +75,12 @@ namespace MusicSwitcher.Controllers {
                 return;
             }
 
+            currentState = State.CLOSED;
+
             w.Release(src);
             src.Stop();
             src = null;
             tracks.Clear();
-            currentState = State.CLOSED;
             ReleaseEvents();
         }
 
@@ -78,11 +88,11 @@ namespace MusicSwitcher.Controllers {
             UpdateState();
             DispatchState();
 
-            UpdateCoroutines();
+            UpdateRoutines();
         }
 
         #endregion
-        #region StateMachine
+        #region StateLogic
 
         private enum State {
             INACTIVE,            // ie not currently in the correct state and so not playing music
@@ -97,9 +107,9 @@ namespace MusicSwitcher.Controllers {
                                                             PAUSING
                                                         +--game paused--> PAUSED_WHILE_ACTIVE  \
                                                         |                      |                \
-                 +--------Ship enters space--------> ACTIVE <---game unpaused--+                 }--Close()  called--> CLOSED
+                 +------Situation becomes Target---> ACTIVE <---game unpaused--+                 }--Close()  called--> CLOSED
                  |                                     |         UNPAUSING                      /   or tracks empty
-             INACTIVE <-------Ship leaves space--------+                                       /
+             INACTIVE <--Situation stops being target--+                                       /
 
                 Note that we don't need to worry about pausing while CLOSED or INACTIVE, since those states
                 produce no sound anyway.
@@ -117,12 +127,12 @@ namespace MusicSwitcher.Controllers {
                 case State.PAUSED_WHILE_ACTIVE:
                     break;
                 case State.ACTIVE:
-                    if (!InSpace) {
+                    if (TargetSituation != CurrentSituation) {
                         Deactivate();
                     }
                     break;
                 case State.INACTIVE:
-                    if (InSpace) {
+                    if (TargetSituation == CurrentSituation) {
                         Activate();
                     }
                     break;
@@ -132,12 +142,12 @@ namespace MusicSwitcher.Controllers {
         private void Activate() {
             currentState = State.ACTIVE;
             currentTrack = int.MaxValue;
-            SetVolume(1f);
+            SetVolume(volume);
         }
 
         private void Deactivate() {
             currentState = State.INACTIVE;
-            coroutines.Add(FadeOut(fadeoutDelta));
+            routines.Add(FadeOut(fadeoutDelta));
         }
 
         private void DispatchState() {
@@ -179,24 +189,25 @@ namespace MusicSwitcher.Controllers {
             }
         }
 
-        public void Pause() {
-            if (currentState == State.ACTIVE) {
+        private void Pause() {
+            if (currentState == State.ACTIVE || currentState == State.UNPAUSING) {
+                routines.Add(PauseFade(pauseFadeDelta));
                 currentState = State.PAUSING;
-                coroutines.Add(PauseFade(pauseFadeDelta));
             }
         }
-        public void UnPause() {
-            if (currentState == State.PAUSED_WHILE_ACTIVE) {
+
+        private void UnPause() {
+            if (currentState == State.PAUSED_WHILE_ACTIVE || currentState == State.PAUSING) {
+                routines.Add(UnPauseFade(pauseFadeDelta));
                 currentState = State.UNPAUSING;
-                coroutines.Add(UnPauseFade(pauseFadeDelta));
             }
         }
 
         #endregion
-        #region Coroutines
+        #region Routines
 
-        private void UpdateCoroutines() {
-            coroutines.Update();
+        private void UpdateRoutines() {
+            routines.Update();
         }
 
         /// <summary>
@@ -208,7 +219,7 @@ namespace MusicSwitcher.Controllers {
         private IEnumerator<CoroutineState> FadeOut(float delta) {
 
             for (float vol = 1f; vol > 0f; vol -= delta) {
-                SetVolume(vol);
+                SetVolume(vol * this.volume);
                 Log.Debug($"set volume to {vol * 100}%", logTag);
                 yield return CoroutineState.RUNNING;
             }
@@ -226,7 +237,7 @@ namespace MusicSwitcher.Controllers {
         private IEnumerator<CoroutineState> PauseFade(float delta) {
 
             for (float vol = 1f; vol > 0f; vol -= delta) {
-                SetVolume(vol);
+                SetVolume(vol * this.volume);
                 Log.Debug($"set volume to {vol * 100}%", logTag);
                 yield return CoroutineState.RUNNING;
             }
@@ -248,12 +259,12 @@ namespace MusicSwitcher.Controllers {
             Log.Debug("unpausing audio source", logTag);
 
             for (float vol = 0f; vol < 1f; vol += delta) {
-                SetVolume(vol);
+                SetVolume(vol * this.volume);
                 Log.Debug($"set volume to {vol * 100}%", logTag);
                 yield return CoroutineState.RUNNING;
             }
 
-            SetVolume(1f);
+            SetVolume(volume);
             Log.Debug($"set volume to 100%", logTag);
             currentState = State.ACTIVE;
             yield return CoroutineState.FINISHED;
@@ -277,5 +288,6 @@ namespace MusicSwitcher.Controllers {
         }
 
         #endregion
+
     }
 }
