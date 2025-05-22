@@ -15,8 +15,8 @@ namespace MusicSwitcher.Controllers {
         private readonly float pauseFadeDelta = .1f;
 
         private readonly List<AudioClip> tracks;
-        private int currentTrack = int.MaxValue; // set to max int to induce a shuffle immediately on play start.
-        private State currentState = State.INACTIVE;
+        private int currentTrack;
+        private State currentState;
         private bool InSpace { get => FlightGlobals.ActiveVessel.orbit.referenceBody.bodyName != "Kerbin"
                                    || FlightGlobals.ActiveVessel.situation == Vessel.Situations.ORBITING
                                    || FlightGlobals.ActiveVessel.situation == Vessel.Situations.SUB_ORBITAL
@@ -53,9 +53,9 @@ namespace MusicSwitcher.Controllers {
                 $"{logTag} for cfg '{cfg.debugName}':");
 
             if (InSpace) {
-                currentState = State.ACTIVE;
+                Activate(); // call activate to set volume, induce shuffle, etc
             } else {
-                currentState = State.INACTIVE;
+                currentState = State.INACTIVE; // we don't need Deactivate()'s fadeout
             }
         }
 

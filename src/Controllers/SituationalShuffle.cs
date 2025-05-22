@@ -15,11 +15,11 @@ namespace MusicSwitcher.Controllers {
         private float fadeoutDelta = .05f;
         private readonly float pauseFadeDelta = .1f;
         private readonly List<AudioClip> tracks;
-        private int currentTrack = int.MaxValue; // set to max int to induce a shuffle immediately on play start.
+        private int currentTrack;
         private Vessel.Situations TargetSituation {get; set;}
         private Vessel.Situations CurrentSituation {get => FlightGlobals.ActiveVessel.situation;}
 
-        private State currentState = State.INACTIVE;
+        private State currentState;
 
         private readonly CoroutineManager routines;
 
@@ -52,10 +52,6 @@ namespace MusicSwitcher.Controllers {
 
             TargetSituation = ConfigNode.CreateObjectFromConfig<Config.Situation>(node).situation;
 
-            if (TargetSituation == CurrentSituation) {
-                currentState = State.ACTIVE;
-            }
-
             volume = Config.Util.FloatOrDefault(
                 "volume", node, 1f,
                 $"{logTag} for cfg '{audioCfg.debugName}':");
@@ -63,6 +59,13 @@ namespace MusicSwitcher.Controllers {
             fadeoutDelta = Config.Util.FloatOrDefault(
                 "fadeoutDelta", node, .05f,
                 $"{logTag} for cfg '{audioCfg.debugName}':");
+
+            if (TargetSituation == CurrentSituation) {
+                Activate(); // activate to induce shuffle, set volume, etc
+            } else {
+                // don't deactivate because deactivate does a fadeout. instead just set state (deactivate does nothing else)
+                currentState = State.INACTIVE;
+            }
         }
 
         public void Add(AudioClip c) => tracks.Add(c);
