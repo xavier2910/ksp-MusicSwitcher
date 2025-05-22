@@ -19,9 +19,9 @@ namespace MusicSwitcher.Controller {
         #region Templates
 
         protected abstract string LogTag { get; }
+        protected abstract bool ActivationCriterion { get; }
         protected abstract void InitializeTasks(AudioSourceWrangler asw, ConfigNode cfg);
         protected abstract void CloseTasks();
-        protected abstract bool ActivationCriterion();
         protected abstract void ActivateTasks();
         protected abstract void WhileActive();
         protected abstract void SetVolume(float vol);
@@ -113,12 +113,12 @@ namespace MusicSwitcher.Controller {
                 case State.PAUSED_WHILE_ACTIVE:
                     break;
                 case State.ACTIVE:
-                    if (!ActivationCriterion()) {
+                    if (!ActivationCriterion) {
                         Deactivate();
                     }
                     break;
                 case State.INACTIVE:
-                    if (ActivationCriterion()) {
+                    if (ActivationCriterion) {
                         Activate();
                     }
                     break;
@@ -156,7 +156,7 @@ namespace MusicSwitcher.Controller {
         }
 
         private void SMInit() {
-            if (ActivationCriterion()) {
+            if (ActivationCriterion) {
                 Activate();
             } else {
                 currentState = State.INACTIVE;

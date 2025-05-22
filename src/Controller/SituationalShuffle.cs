@@ -23,6 +23,10 @@ namespace MusicSwitcher.Controller {
 
         protected override string LogTag => logTag;
 
+        protected override bool ActivationCriterion
+            => TargetSituation == CurrentSituation
+            && tracks.Count > 0; // don't want no crashes eh?
+
         protected override void InitializeTasks(AudioSourceWrangler w, ConfigNode node) {
             this.w = w;
             src = w.Get();
@@ -46,11 +50,6 @@ namespace MusicSwitcher.Controller {
             src.Stop();
             src = null;
             tracks.Clear();
-        }
-
-        protected override bool ActivationCriterion() {
-            return TargetSituation == CurrentSituation
-                && tracks.Count > 0; // don't want no crashes eh?
         }
 
         protected override void ActivateTasks() {
