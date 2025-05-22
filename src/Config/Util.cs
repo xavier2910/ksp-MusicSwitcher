@@ -43,5 +43,15 @@ namespace MusicSwitcher.Config {
                 return def;
             }
         }
+
+        private static readonly string kDebugName = "debugName";
+        private static readonly string kInvalid = "!INVALID!";
+        public static string DebugName(ConfigNode node) {
+            if (!node.HasValue(kDebugName)) {
+                return kInvalid;
+            }
+
+            return node.GetValue(kDebugName);
+        }
     }
 }
