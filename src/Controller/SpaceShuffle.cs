@@ -12,7 +12,8 @@ namespace MusicSwitcher.Controller {
         private AudioSource src;
         private readonly List<AudioClip> tracks = new();
         private int currentTrack;
-        private bool InSpace { get => FlightGlobals.ActiveVessel.orbit.referenceBody.bodyName != "Kerbin"
+        
+        private bool InSpace { get => FlightGlobals.getMainBody().isHomeWorld
                                    || FlightGlobals.ActiveVessel.situation == Vessel.Situations.ORBITING
                                    || FlightGlobals.ActiveVessel.situation == Vessel.Situations.SUB_ORBITAL
                                    || FlightGlobals.ActiveVessel.situation == Vessel.Situations.ESCAPING
