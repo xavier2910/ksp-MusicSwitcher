@@ -12,13 +12,12 @@ namespace MusicSwitcher.Controller {
         private AudioSource src;
         private readonly List<AudioClip> tracks = new();
         private int currentTrack;
-        
-        private bool InSpace { get => FlightGlobals.getMainBody().isHomeWorld
-                                   || FlightGlobals.ActiveVessel.situation == Vessel.Situations.ORBITING
-                                   || FlightGlobals.ActiveVessel.situation == Vessel.Situations.SUB_ORBITAL
-                                   || FlightGlobals.ActiveVessel.situation == Vessel.Situations.ESCAPING
-                                   || FlightGlobals.ActiveVessel.situation == Vessel.Situations.DOCKED;
-        }
+
+        private bool InSpace => FlightGlobals.getMainBody().isHomeWorld
+                             || FlightGlobals.ActiveVessel.situation == Vessel.Situations.ORBITING
+                             || FlightGlobals.ActiveVessel.situation == Vessel.Situations.SUB_ORBITAL
+                             || FlightGlobals.ActiveVessel.situation == Vessel.Situations.ESCAPING
+                             || FlightGlobals.ActiveVessel.situation == Vessel.Situations.DOCKED;
 
         private readonly System.Random rnd = new();
         private readonly string logTag = "[SpaceShuffle]";
