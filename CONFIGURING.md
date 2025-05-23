@@ -29,7 +29,7 @@ These controllers can *only* be used as `_FLIGHT` controllers. Using them with o
 ```go
 MUSICCONTROLLER_FLIGHT
 {
-    typeName = MusicSwitcher.Controllers.SituationalShuffle
+    typeName = MusicSwitcher.Controller.SituationalShuffle
     situation = <situation id>
     // <situation id>'s:
     // LANDED      =   1
@@ -56,7 +56,7 @@ Plays a shuffle of the specified music tracks while the active vessel is in the 
 ```go
 MUSICCONTROLLER_FLIGHT
 {
-    typeName = MusicSwitcher.Controllers.SpaceShuffle
+    typeName = MusicSwitcher.Controller.SpaceShuffle
     fadeoutDelta = <float on [0,1]> // applied per frame; small is probably good. OPTIONAL default 0.05
     trackPaths
     {
@@ -76,7 +76,7 @@ These controllers can be used in any scene without problems. N.B. that you must 
 ```go
 MUSICCONTROLLER_xxx
 {
-    typeName = MusicSwitcher.Controllers.QCtlr
+    typeName = MusicSwitcher.Controller.QCtlr
     trackPaths
     {
         Item = gdb/path/to/clip
